@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "lexer.h"
+#include "include\lexer.h"
 #include "log\log.h"
-#include "graph_tokens.h"
+#include "include\graph_tokens.h"
 
 tokens_t* tokens_ctor (tokens_t *tokens, size_t capacity)
 {
@@ -70,7 +70,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
         get_text(input, &text, file_name);
         token_arg_t  temp_token = {};
 
-        for (size_t ip = 0, i = 0; ip < text.n_chars; ip++, i++) {
+        for (size_t ip = 0, i = 0; ip < text.n_chars; i++) {
                 $lld(ip)
                 if (get_arg(tokens->tok_args + i, text.buf, &ip)) {
                         $
@@ -86,6 +86,13 @@ int get_tokens (tokens_t *tokens, const char *file_name)
                 $lld(ip)
         }
 
+        log(2, "%lld", tokens->size);
+        tokens->tok_args[tokens->size].type = END_FILE;
+        tokens->tok_args[tokens->size].name[0] = '/';
+        tokens->tok_args[tokens->size].atr = temp_token.atr;
+        tokens->tok_args[tokens->size].val = '/';
+        tokens->size += 1;
+
         return 0;
 }
 
@@ -97,24 +104,29 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
 
         if ('a' <= buf[*ip] && buf[*ip] <= 'z') {
                 get_word(token, buf, ip);
-                token->type = WORD;
+                token->type = VARIABLE;
         } else if ('1' <= buf[*ip] && buf[*ip] <= '9') {
                 get_number(token, buf, ip);
-                token->type = NUMBER;
         } else {
                 log(1, "HERE");
                 $c(buf[*ip])
                 switch (buf[*ip]) {
                 case '+':
                 case '-':
+                        log(1, "I am stupid lexer");
+                        token->type    = PM_OPERATOR;
+                        token->name[0] = buf[*ip];
+                        ++*ip;
+                        break;
                 case '*':
                 case '/':
-                        token->type    = OPERATOR;
+                        token->type    = MD_OPERATOR;
                         token->name[0] = buf[*ip];
                         ++*ip;
                         break;
                 case '\n':
                 case ' ':
+                        ++*ip;
                         return 0;
                 default:
                         log(1, "HERE");
@@ -128,6 +140,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
                                 }
                                 get_punct(token, buf, ip);
                         }
+                        ++*ip;
                         break;
                 }
         }
@@ -141,10 +154,14 @@ int get_number(token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(buf);
         assert_ptr(ip);
 
-        for (int i = 0; '1' <= buf[*ip] && buf[*ip] <= '9'; i++) {
-                token->name[i] = buf[*ip];
+
+        elem_t val = 0;
+        for (int i = 1; '0' <= buf[*ip] && buf[*ip] <= '9'; i++) {
+                val = (buf[*ip] - '0') * i;
                 ++*ip;
         }
+        token->val = val;
+        token->type = NUMBER;
 
         return 0;
 }
@@ -175,8 +192,6 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
         case '!':
         case '>':
         case '<':
-                $
-                log(1, "HERE FUCK");
                 if (buf[*ip + 1] == '=') {
                         token->name[0] = buf[(*ip)++];
                         token->type = RELATIVE_OP;
@@ -203,6 +218,7 @@ int get_punct (token_arg_t *token, char *buf, size_t *ip)
         case '_':
                 break;
         case ';':
+                $
                 token->type = END_LINE;
                 token->name[0] = buf[*ip];
                 ++*ip;

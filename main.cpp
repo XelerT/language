@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "tree\text_tree.h"
 #include "tree\tree_dump.h"
-#include "lexer.h"
-#include "graph_tokens.h"
+#include "include\lexer.h"
+#include "include\graph_tokens.h"
+#include "tree\token_tree.h"
 
 int main ()
 {
@@ -17,19 +18,18 @@ int main ()
         //         return error;
         // replace_n(&text);
         // divide_text(&text);
-        // size_t char_count = 0;
-        // tree.root = get_g(text.buf, &char_count, &tree);
-        // tree_graph(&tree, "tree_graph.dot");
 
         tokens_t tokens = {};
-        $
         tokens_ctor(&tokens, 100);
-        $
-        // log_dtor();
+
+        // printf("ў\n");
 
         get_tokens(&tokens, "input.txt");
         $
-        arr_graph (&tokens, "tokens_graph.dot", "graph.png");
+        arr_graph (&tokens, "tokens_graph.dot", "tokens.png");
+        size_t tp = 0;
+        tree.root = get_g(&tokens, &tp, &tree);
+        tree_graph(&tree, "tree_graph.dot", "tree.png");
         $
         log_dtor();
         return 0;

@@ -27,7 +27,7 @@ node_t* tree_insert (const node_t *temp_node)
         node->atr  = temp_node->atr;
         node->data = temp_node->data;
         node->type = temp_node->type;
-        strcpy(node->func, temp_node->func);
+        strcpy(node->name, temp_node->name);
         node->new_node = 1;
         node->left = nullptr;
         node->right = nullptr;
@@ -48,8 +48,6 @@ int tree_dtor (tree_t *tree)
 void free_nodes (node_t *node)
 {
         assert(node);
-        $p(node)
-        $c(node->data.op)
         if (node->left) {
                 free_nodes(node->left);
         }

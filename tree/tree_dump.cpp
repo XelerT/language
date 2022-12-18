@@ -74,7 +74,7 @@ static const char nodes_tie_atr[] = "node%p -> node%p [color = %s];\n";
 static FILE *dot_file = nullptr;
 #define gv_print(form,...) fprintf(dot_file, form, __VA_ARGS__)
 
-void tree_graph (tree_t *tree, const char *dot_file_name)
+void tree_graph (tree_t *tree, const char *dot_file_name, const char* png_name)
 {
         if (!tree) {
                 fprintf(stderr, "Tree pointer is null. \nIn File: \n\t%s \nLine: \n\t%d.\n", __FILE__, __LINE__);
@@ -93,6 +93,7 @@ void tree_graph (tree_t *tree, const char *dot_file_name)
 
         fprintf(dot_file, "\n}");
         fclose(dot_file);
+        log_pic(3, "<img src=\"%s\" width=\"460\" alt=\"%s\">", png_name, png_name);
 }
 
 void print_gv_nodes (node_t *node)
@@ -106,14 +107,14 @@ void print_gv_nodes (node_t *node)
                  node->atr.width, node->atr.fixedsize, node->atr.fillcolor,node->atr.fontsize,
                  node->atr.penwidth);
 
-        if (node->type == VARIABLE || node->type == CONST)
-                gv_print(node_sample_dec, node, node->data.var);
-        else if (node->type == OPERATOR)
-                gv_print(node_sample_dec, node, node->data.op);
-        else if (node->type == NUMBER)
-                gv_print(node_sample_dbl, node, node->data.dbl);
-        else if (node->type == FUNC)
-                gv_print(node_sample_str, node, node->func);
+        // if (node->type == VARIABLE || node->type == CONST)
+        //         gv_print(node_sample_dec, node, node->data.var);
+        // else if (node->type == OPERATOR)
+        //         gv_print(node_sample_dec, node, node->data.op);
+        if (node->type == NUMBER)
+                gv_print(node_sample_dec, node, node->data);
+        else
+                gv_print(node_sample_str, node, node->name);
 }
 
 

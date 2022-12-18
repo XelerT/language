@@ -1,9 +1,20 @@
 #ifndef LOG_H
 #define LOG_H
 
-#define assert_ptr(ptr) massert(ptr, #ptr, __FILE__, __LINE__)
+#include "..\include\config.h"
+
+#ifdef ASSERT_ON
+        #define assert_ptr(ptr) massert(ptr, #ptr, __FILE__, __LINE__)
+#else
+        #define assert_ptr()
+#endif /*ASSERT_ON*/
+#ifdef LOG_ON
 #define log(num,...)    mlog((const char*) make_line(num,__VA_ARGS__), __FILE__, __LINE__)
 #define log_pic(num,...) log_pict((const char*) make_line(num,__VA_ARGS__), __FILE__, __LINE__)
+#else
+        #define log(num,...)
+        #define log_pic(num,...)
+#endif /*LOG_ON*/
 
 #include "..\debug\debug.h"
 

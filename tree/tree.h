@@ -1,8 +1,8 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "..\debug\debug.h"
-#include "..\log\log.h"
+#include "..\include\config.h"
+#include "..\include\tokens.h"
 
 enum tree_errors {
         NULL_TREE_PTR = 1,
@@ -15,17 +15,6 @@ enum errors {
         NULL_FILE_PTR = -2
 };
 
-struct graph_node_atr_t {
-        const char *shape = "rectangle";
-        const char *style = "rounded";
-        const char *fixedsize = "false";
-        const char *fillcolor = "#00b899";
-        int height = 3;
-        int width = 2;
-        int fontsize = 30;
-        int penwidth = 5;
-};
-
 enum operator_t {
         ADD = '+',
         SUB = '-',
@@ -35,33 +24,19 @@ enum operator_t {
         ASS = '='
 };
 
-union elem_t {
-        char   var;
-        int     op;
-        double dbl;
-};
-
-enum types_t {
-        VARIABLE    =  1,
-        OPERATOR    =  2,
-        NUMBER      =  3,
-        FUNC        =  4,
-        CONST       =  5,
-        ASSIGNMENT  =  6,
-        RELATIVE_OP =  7,
-        END_LINE    =  8,
-        WORD        =  9
-};
-
-const int MAX_NAME_LENGTH = 50;
+// union elem_t {
+//         char   var;
+//         int     op;
+//         double dbl;
+// };
 
 struct node_t {
         node_t *left  = nullptr;
         node_t *right = nullptr;
         size_t indx   =       0;
         int new_node  =       0;
-        elem_t data;
-        char func[MAX_NAME_LENGTH] = {};
+        elem_t data   =       0;
+        char name[MAX_NAME_LENGTH] = {}; /*was func*/
         char type = 0;
 
         graph_node_atr_t atr = {};

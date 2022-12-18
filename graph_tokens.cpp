@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
-#include "graph_tokens.h"
+#include "include\graph_tokens.h"
 
 static const char digraph_atr_sample[] = "digraph %s {                                  \
                                                 \ngraph [dpi = %d];                     \
@@ -65,10 +65,13 @@ void print_gv_arr_nodes (tokens_t *tokens)
                 //         gv_print(node_sample_dec, node, node->data.var);
                 // else if (node->type == OPERATOR)
                 //         gv_print(node_sample_dec, node, node->data.op);
-                // else if (node->type == NUMBER)
-                //         gv_print(node_sample_dbl, node, node->data.dbl);
+                if (node->type == NUMBER)
+                        gv_print(node_sample_dec, node, node->val);
                 // else if (node->type == FUNC)
-                gv_print(node_sample_str, node, node->name);
+                else {
+                        gv_print(node_sample_str, node, node->name);
+                        log(2, "i hate my shit_code %s", node->name);
+                }
         }
 }
 
