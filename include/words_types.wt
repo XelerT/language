@@ -1,0 +1,5 @@
+WT(DATA_TYPE, 11, STR)
+WT(OPERATOR, 12, STR)
+WT(NAME, 13, STR)
+
+//WT(WORDTYPE, number, GV option)

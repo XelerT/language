@@ -1,0 +1,12 @@
+//SYMB(KEY, arg, have code, type, code)
+
+SYMB(1,  '+', 21, ADD_OPERATOR,  1,  {ass_type(ADD_OPERATOR); assign;})
+SYMB(1,  '-', 22, SUB_OPERATOR,  1,  {ass_type(SUB_OPERATOR); assign;})
+SYMB(1,  '*', 23, MUL_OPERATOR,  1,  {ass_type(MUL_OPERATOR); assign;})
+SYMB(1,  '/', 24, DIV_OPERATOR,  1,  {ass_type(DIV_OPERATOR); assign;})
+SYMB(1, '\n', 25, NEW_LINE,      1,  {contin; return 0;})
+SYMB(1,  ' ', 26, SPACE,         1,  {contin; return 0;})
+
+SYMB(0, '(', 27, OP_BRACKET, 1, {ass_type(OP_BRACKET); assign;})
+SYMB(0, ')', 28, CL_BRACKET, 1, {ass_type(CL_BRACKET); assign;})
+SYMB(0, ';', 29, END_LINE,   1, {ass_type(END_LINE);   assign;})

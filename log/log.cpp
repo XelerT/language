@@ -13,8 +13,11 @@ int log_init (const char *log_file_name)
         assert_ptr(log_file_name);
 
         LOG_FILE = fopen(log_file_name, "w");
+        if (setvbuf(LOG_FILE, nullptr, _IONBF, 0))
+                return VBUF_ERR;
         fprintf(LOG_FILE, "<pre>\n");
         fprintf(LOG_FILE, "<body style=\"background-color:#B4D1CC;\">\n");
+
         return 0;
 }
 
@@ -84,6 +87,12 @@ char* make_line (int argc, ...)
                                 sprintf(LOG_LINE + j, "%lg", va_arg(valist, double));
                                 j += strlen(LOG_LINE + j);
                                 i+= 1;
+                        } else if (temp_str[i] == 'c') {
+                                sprintf(LOG_LINE + j, "%c", va_arg(valist, int));
+                                j += strlen(LOG_LINE + j);
+                        } else if (temp_str[i] == 'd') {
+                                sprintf(LOG_LINE + j, "%d", va_arg(valist, int));
+                                j += strlen(LOG_LINE + j);
                         } else {
                                 sprintf(LOG_LINE + j, "/unknown sign/");
                                 j += strlen(LOG_LINE + j);

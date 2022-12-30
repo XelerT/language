@@ -1,5 +1,5 @@
 CFILES = main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp \
-	 lexer.cpp graph_tokens.cpp tree\token_tree.cpp
+	 lexer.cpp graph_tokens.cpp tree\token_tree.cpp backend.cpp
 OUTPUT = a.exe
 IMG_FORMAT = png
 DOT_FILE_NAME = tokens_graph.dot
@@ -55,7 +55,9 @@ run:
 
 .PHONY: clean
 clean:
-	@ rm -f $(OUTPUT)
+	ifneq ($(OUTPUT))
+		del -f $(OUTPUT)
+	endif
 
 .PHONY: clean_cmd
 clean_cmd:
@@ -68,3 +70,11 @@ graphviz:
 .PHONY: original_graphviz
 original_graphviz:
 	@ dot -T $(IMG_FORMAT) -o tree_graph.$(IMG_FORMAT) tree_graph.dot
+
+.PHONY: graph_tokens
+graph_tokens:
+	@ dot -T $(IMG_FORMAT) -o tokens.png tokens_graph.dot
+
+.PHONY: graph_tree
+graph_tree:
+	@ dot -T $(IMG_FORMAT) -o tree.png tree_graph.dot

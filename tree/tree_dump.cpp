@@ -66,7 +66,8 @@ static const char edge_atr_sample[] = "\nedge[penwidth = %d, color = \"%s\"];";
 
 static const char node_sample_str[]  = "node%p [label = \"%s\"];\n";
 static const char node_sample_dbl[]  = "node%p [label = \"%lg\"];\n";
-static const char node_sample_dec[]  = "node%p [label = \"%c\"];\n";
+static const char node_sample_c[]    = "node%p [label = \"%c\"];\n";
+static const char node_sample_dec[]  = "node%p [label = \"%d\"];\n";
 
 static const char nodes_tie_atr[] = "node%p -> node%p [color = %s];\n";
 
@@ -96,6 +97,12 @@ void tree_graph (tree_t *tree, const char *dot_file_name, const char* png_name)
         log_pic(3, "<img src=\"%s\" width=\"460\" alt=\"%s\">", png_name, png_name);
 }
 
+
+#define KW(word,type,number)    if (type == DATA_TYPE) {                                                                \
+                                        if (number == node->var_type){                                                   \
+                                                gv_print(node_sample_var, node, node->name, #word, node->data);}         \
+                                }
+
 void print_gv_nodes (node_t *node)
 {
         if (node->left)
@@ -107,18 +114,28 @@ void print_gv_nodes (node_t *node)
                  node->atr.width, node->atr.fixedsize, node->atr.fillcolor,node->atr.fontsize,
                  node->atr.penwidth);
 
-        // if (node->type == VARIABLE || node->type == CONST)
-        //         gv_print(node_sample_dec, node, node->data.var);
-        // else if (node->type == OPERATOR)
-        //         gv_print(node_sample_dec, node, node->data.op);
-        if (node->type == NUMBER)
+        const char node_sample_var[]  = "node%p [shape = record label = \"{%s | {%s | %d}}\"];\n";  // var_name/type/value
+        const char node_sample_ass[]  = "node%p [shape = record label = \"{%s | %s}\"];\n";
+
+        if (node->type == VARIABLE) {
+                #include "..\include\key_words.kw"
+                log(3, "Graph variable with type: \"%d\", name: \"%s\"", node->var_type, node->name);
+        } else if (node->type == ASSIGNMENT) {
+                gv_print(node_sample_ass, node, node->name, "assign");
+                log(2, "Graph assignment: %s", node->name);
+        } else if (node->type == NUMBER) {
                 gv_print(node_sample_dec, node, node->data);
-        else
+                log(2, "Graph number: %d", node->data);
+        } else if (node->type == NAME) {
+                gv_print(node_sample_ass, node, node->name, "name");
+                log(3, "Graph name %s type \"%d\"", node->name, node->type);
+        } else {
                 gv_print(node_sample_str, node, node->name);
+                log(3, "Graph else option %s type \"%d\"", node->name, node->type);
+        }
 }
 
-
-// conect
+#undef KW
 
 void tie_gv_nodes (node_t *node)
 {

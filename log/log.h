@@ -21,6 +21,7 @@
 enum log_errors {
         ASSERTION  = 0xACCE,
         CLOSED_LOG = 0xBAD106,
+        VBUF_ERR   = 0xBADB0F
 };
 
 int massert (const void *ptr, const char *var, const char *file, int line);

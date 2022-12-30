@@ -24,9 +24,10 @@ node_t* tree_insert (const node_t *temp_node)
         if (!node)
                 return nullptr;
 
-        node->atr  = temp_node->atr;
-        node->data = temp_node->data;
-        node->type = temp_node->type;
+        node->atr      = temp_node->atr;
+        node->data     = temp_node->data;
+        node->type     = temp_node->type;
+        node->var_type = temp_node->var_type;
         strcpy(node->name, temp_node->name);
         node->new_node = 1;
         node->left = nullptr;
@@ -40,7 +41,6 @@ int tree_dtor (tree_t *tree)
         if (!tree)
                 return NULL_TREE_PTR;
         free_nodes(tree->root);
-        // free(tree);
 
         return 0;
 }

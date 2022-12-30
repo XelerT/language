@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
 #include "include\lexer.h"
 #include "log\log.h"
 #include "include\graph_tokens.h"
@@ -71,23 +74,22 @@ int get_tokens (tokens_t *tokens, const char *file_name)
         token_arg_t  temp_token = {};
 
         for (size_t ip = 0, i = 0; ip < text.n_chars; i++) {
-                $lld(ip)
                 if (get_arg(tokens->tok_args + i, text.buf, &ip)) {
-                        $
                         resize_tokens(tokens);
                         tokens->tok_args[i].atr = temp_token.atr;
                         tokens->size += 1;
                         log(2, "Number of tokens: %lld", tokens->size);
-                        log(3, "token(%lld) is \"%s\"", i, tokens->tok_args[i].name);
-                        // return ARG_ERROR;
+                        log(4, "token(%lld) is \"%s\", type: %d", i, tokens->tok_args[i].name, tokens->tok_args[i].type);
                 } else {
                         i--;
                 }
-                $lld(ip)
         }
 
         log(2, "%lld", tokens->size);
         tokens->tok_args[tokens->size].type = END_FILE;
+        log(4, "token(%lld) is \"%s\", type: %c", tokens->size, tokens->tok_args[tokens->size].name,
+                                       tokens->tok_args[tokens->size].type);
+
         tokens->tok_args[tokens->size].name[0] = '/';
         tokens->tok_args[tokens->size].atr = temp_token.atr;
         tokens->tok_args[tokens->size].val = '/';
@@ -96,47 +98,51 @@ int get_tokens (tokens_t *tokens, const char *file_name)
         return 0;
 }
 
+#define KW(name_arg,type_arg,num)       if (!stricmp(#name_arg, token->name)) {                 \
+                                                token->type = type_arg;                         \
+                                                token->var_type = num;                          \
+                                        } else
+
+#define SYMB(key,arg,num,type_arg,is,code) case arg:                                                       \
+                                                if (key) {                                                 \
+                                                        if (is)                                            \
+                                                                code                                       \
+                                                        contin;                                            \
+                                                } else {                                                   \
+                                                        get_punct(token, buf, ip);                         \
+                                                }                                                          \
+                                                log(2, "*****%lld****", type_arg);     \
+                                                break;
+
+#define assign token->name[0] = buf[*ip]
+#define ass_type(type_arg) token->type = type_arg
+#define contin ++*ip
+
 int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert errors
 {
         assert_ptr(token);
         assert_ptr(buf);
         assert_ptr(ip);
 
-        if ('a' <= buf[*ip] && buf[*ip] <= 'z') {
+        if (isalpha(buf[*ip])) {
                 get_word(token, buf, ip);
-                token->type = VARIABLE;
-        } else if ('1' <= buf[*ip] && buf[*ip] <= '9') {
+                #include "include\key_words.kw"
+                /*else*/
+                        token->type = NAME;
+        } else if (isdigit(buf[*ip])) {
                 get_number(token, buf, ip);
+                log(2, "DIGIT-TOKEN has type %d", token->type);
         } else {
-                log(1, "HERE");
-                $c(buf[*ip])
                 switch (buf[*ip]) {
-                case '+':
-                case '-':
-                        log(1, "I am stupid lexer");
-                        token->type    = PM_OPERATOR;
-                        token->name[0] = buf[*ip];
-                        ++*ip;
-                        break;
-                case '*':
-                case '/':
-                        token->type    = MD_OPERATOR;
-                        token->name[0] = buf[*ip];
-                        ++*ip;
-                        break;
-                case '\n':
-                case ' ':
-                        ++*ip;
-                        return 0;
+                #include "include\symbles.sym"
                 default:
-                        log(1, "HERE");
                         if (!get_relat_op(token, buf, ip)) {
-                                log(1, "HERE");
                                 if (buf[*ip] == '=') {
-                                        log(1, "HERE");
                                         token->type = ASSIGNMENT;
                                         token->name[0] = buf[*ip];
-                                        break;
+                                        ++*ip;
+                                        log(3, "ASSIGNMENT %d %s", token->type, token->name);
+                                        return 1;
                                 }
                                 get_punct(token, buf, ip);
                         }
@@ -147,6 +153,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
 
         return 1;
 }
+#undef SYMB
 
 int get_number(token_arg_t *token, char *buf, size_t *ip)
 {
@@ -154,12 +161,17 @@ int get_number(token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(buf);
         assert_ptr(ip);
 
-
-        elem_t val = 0;
-        for (int i = 1; '0' <= buf[*ip] && buf[*ip] <= '9'; i++) {
-                val = (buf[*ip] - '0') * i;
+        elem_t rev_val = 0;
+        for (int i = 0; isdigit(buf[*ip]); i++) {
+                rev_val += (buf[*ip] - '0') * (elem_t) pow(10, i);
                 ++*ip;
         }
+        elem_t val = 0;
+        for (int i = 0; rev_val; i++) {
+                val = val * 10 + (rev_val % 10);
+                rev_val /= 10;
+        }
+
         token->val = val;
         token->type = NUMBER;
 
@@ -172,7 +184,7 @@ int get_word(token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(buf);
         assert_ptr(ip);
 
-        for (int i = 0; 'a' <= buf[*ip] && buf[*ip] <= 'z'; i++) {
+        for (int i = 0; isalpha(buf[*ip]); i++) {
                 token->name[i] = buf[*ip];
                 ++*ip;
         }
@@ -185,19 +197,19 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(token);
         assert_ptr(buf);
         assert_ptr(ip);
-        log(1, "HERE");
-        $
+
         switch (buf[*ip]) {
         case '=':
         case '!':
         case '>':
         case '<':
                 if (buf[*ip + 1] == '=') {
+                        log(1, "??==??");
                         token->name[0] = buf[(*ip)++];
                         token->type = RELATIVE_OP;
-                        // ++*ip;
                         return '=';
                 }
+                log(1, "-----==-----");
                 break;
         default:
                 return 0;
@@ -205,6 +217,14 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
 
         return 0;
 }
+
+#define SYMB(key,arg,num,type_arg,is,code) case arg:                                                          \
+                                                if (!key) {                                                   \
+                                                        if (is)                                               \
+                                                                code                                          \
+                                                        contin;                                               \
+                                                }                                                             \
+                                                break;
 
 int get_punct (token_arg_t *token, char *buf, size_t *ip)
 {
@@ -213,19 +233,15 @@ int get_punct (token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(ip);
 
         switch (buf[*ip]) {
-        case '.':
-        case ',':
-        case '_':
-                break;
-        case ';':
-                $
-                token->type = END_LINE;
-                token->name[0] = buf[*ip];
-                ++*ip;
-                break;
+#include "include\symbles.sym"
         default:
                 return 0;
         }
 
         return 0;
 }
+
+#undef assign
+#undef ass_type
+#undef contin
+#undef SYMB

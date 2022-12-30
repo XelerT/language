@@ -24,4 +24,9 @@ struct digraph_t {
         const char *splines = "ortho";
 };
 
+enum main_errors {
+        ALLOC_ERR = 0xBADA110C,
+        REALLOC_ERR = 0xBADA110C
+};
+
 #endif /*UTILS_H*/
