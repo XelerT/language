@@ -52,7 +52,7 @@ void arr_graph (tokens_t *tokens, const char *dot_file_name, const char* png_nam
 }
 
 #define KW(word,type,number)    /*if (type == DATA_TYPE) {*/                                                                \
-                                        if (number == node->var_type)                                                   \
+                                        if (number == node->sub_type)                                                   \
                                                 gv_print(node_sample_var, node, node->name, #word, node->val);          \
                                 // }
 
@@ -70,13 +70,15 @@ void print_gv_arr_nodes (tokens_t *tokens)
                 const char node_sample_data_t[]  = "node%p [shape = record label = \"{%s | {%s | %d}}\"];\n";
 
                 if (node->type == DATA_TYPE) {
-                        gv_print(node_sample_data_t, node, node->name, "data type", node->var_type);
+                        gv_print(node_sample_data_t, node, node->name, "data type", node->sub_type);
                         log(2, "Paint token with DATA_TYPE type");
                 } else if (node->type == NAME) {
                         gv_print(node_sample_str, node, node->name, "name type");
                         log(2, "Paint token with name type");
                 } else if (node->type == NUMBER) {
                         gv_print(node_sample_dec, node, node->val);
+                } else if (node->type == OPERATOR && node->sub_type == 2) {
+                        gv_print(node_sample_str, node, node->name, "if");
                 } else if (node->type == ASSIGNMENT) {
                         gv_print(node_sample_str, node, node->name, "assignment");
                 } else {

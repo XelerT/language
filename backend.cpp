@@ -44,7 +44,7 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
                 fprintf(output, "push [rax + %lld]\n", indent);
                 break;
         case VARIABLE:
-                if (var_init(gl_table, node->var_type, node->name))
+                if (var_init(gl_table, node->sub_type, node->name))
                         return INIT_ERROR;
                 log(2, "Initialized \"%s\" variable", node->name);
                 break;
@@ -93,7 +93,7 @@ size_t find_var (table_t *table, char *name)
         return SIZE_T_ERROR;
 }
 
-int var_init (table_t *table, int var_type, char *name)
+int var_init (table_t *table, int sub_type, char *name)
 {
         assert_ptr(table);
         assert_ptr(name);

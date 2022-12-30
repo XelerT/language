@@ -100,7 +100,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
 
 #define KW(name_arg,type_arg,num)       if (!stricmp(#name_arg, token->name)) {                 \
                                                 token->type = type_arg;                         \
-                                                token->var_type = num;                          \
+                                                token->sub_type = num;                          \
                                         } else
 
 #define SYMB(key,arg,num,type_arg,is,code) case arg:                                                       \

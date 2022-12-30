@@ -93,7 +93,7 @@ node_t* get_t (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tp);
         assert_ptr(tree);
         $
-        node_t *l_node = get_p(tokens, tp, tree);
+        node_t *l_node = get_if(tokens, tp, tree);
         node_t *node   = nullptr;
         while (arg[*tp].type == MUL_OPERATOR || arg[*tp].type == DIV_OPERATOR) {
                 $d(arg[*tp].type)
@@ -113,6 +113,39 @@ node_t* get_t (const tokens_t *tokens, size_t *tp, tree_t *tree)
         if (node)
                 return node;
 
+        return l_node;
+}
+
+node_t* get_if (const tokens_t *tokens, size_t *tp, tree_t *tree)
+{
+        assert_ptr(tokens);
+        assert_ptr(tp);
+        assert_ptr(tree);
+
+        node_t *l_node = nullptr;
+        node_t *line_node = nullptr;
+        node_t *if_node   = nullptr;
+
+        if (arg[*tp].type == OPERATOR && arg[*tp].sub_type == 2) {
+                node_t temp_node = {
+                        .type    = END_LINE,
+                        .name = ";",
+                };
+                line_node = tree_insert(&temp_node);
+                edit_temp(&temp_node, arg + *tp);
+                if_node   = tree_insert(&temp_node);
+                ++*tp;
+                l_node = get_p(tokens, tp, tree);
+
+                if_node->right  = get_e(tokens, tp, tree);
+                line_node->left = if_node;
+                if_node->left   =  l_node;
+        } else {
+                l_node = get_p(tokens, tp, tree);
+        }
+
+        if (line_node)
+                return line_node;
         return l_node;
 }
 
@@ -190,10 +223,10 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
         case DATA_TYPE:
                 if (arg[*tp + 1].type == NAME) {
                         node.type = VARIABLE;
-                        node.var_type = arg[*tp].var_type;
+                        node.sub_type = arg[*tp].sub_type;
                         strcpy(node.name, arg[*tp + 1].name);
                         *tp += 2;
-                        log(3, "Created variable with type: \"%d\", name: \"%s\"", node.var_type, node.name);
+                        log(3, "Created variable with type: \"%d\", name: \"%s\"", node.sub_type, node.name);
                 } else {
                         log(1, "<span style = \"color: red; font-size:16px;\">!No variable name after data type!</span>");
                 }

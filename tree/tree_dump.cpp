@@ -99,7 +99,7 @@ void tree_graph (tree_t *tree, const char *dot_file_name, const char* png_name)
 
 
 #define KW(word,type,number)    if (type == DATA_TYPE) {                                                                \
-                                        if (number == node->var_type){                                                   \
+                                        if (number == node->sub_type){                                                   \
                                                 gv_print(node_sample_var, node, node->name, #word, node->data);}         \
                                 }
 
@@ -119,7 +119,7 @@ void print_gv_nodes (node_t *node)
 
         if (node->type == VARIABLE) {
                 #include "..\include\key_words.kw"
-                log(3, "Graph variable with type: \"%d\", name: \"%s\"", node->var_type, node->name);
+                log(3, "Graph variable with type: \"%d\", name: \"%s\"", node->sub_type, node->name);
         } else if (node->type == ASSIGNMENT) {
                 gv_print(node_sample_ass, node, node->name, "assign");
                 log(2, "Graph assignment: %s", node->name);

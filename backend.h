@@ -23,7 +23,7 @@ struct table_t {
 
 int create_asm (tree_t *tree, char *file_name);
 int asm_node (node_t *node, table_t *gl_table, FILE *output);
-int var_init (table_t *table, int var_type, char *name);
+int var_init (table_t *table, int sub_type, char *name);
 int resize_table (table_t *table);
 int table_ctor (table_t *table, size_t capacity);
 size_t find_var (table_t *table, char *name);

@@ -31,7 +31,7 @@ enum symb_types_t {
 
 struct token_arg_t {
         unsigned char   type     = 0;
-        char   var_type = 0;
+        char   sub_type = 0;
         elem_t val      = 0;
         char name[MAX_NAME_LENGTH] = {'\0'};
 

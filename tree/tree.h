@@ -31,7 +31,7 @@ struct node_t {
         int new_node           =       0;
         elem_t data            =       0;
         unsigned char type     =       0;
-        char var_type          =       0;
+        char sub_type          =       0;
         char name[MAX_NAME_LENGTH] = {};
 
         graph_node_atr_t atr = {};
