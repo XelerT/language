@@ -24,7 +24,7 @@ enum word_types_t {
 
 enum symb_types_t {
         #include "symbles.sym"
-        ASSIGNMENT  =  201
+        ASSIGNMENT  =  255
 };
 
 #undef SYMB

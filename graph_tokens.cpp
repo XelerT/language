@@ -16,7 +16,7 @@ static const char node_atr_sample[] = "\nnode%p[shape = \"%s\", style = \"%s\", 
 
 static const char edge_atr_sample[] = "\nedge[penwidth = %d, color = \"%s\"];";
 
-static const char node_sample_str[]  = "node%p [shape = record label = \"{%s | %s}\"];\n";
+static const char node_sample_str[]  = "node%p [shape = record label = \"{\\%s | %s}\"];\n";
 static const char node_sample_dbl[]  = "node%p [label = \"%lg\"];\n";
 static const char node_sample_c[]    = "node%p [label = \"%c\"];\n";
 static const char node_sample_dec[]  = "node%p [label = \"%d\"];\n";
@@ -58,10 +58,8 @@ void arr_graph (tokens_t *tokens, const char *dot_file_name, const char* png_nam
 
 void print_gv_arr_nodes (tokens_t *tokens)
 {
-
         token_arg_t *node = nullptr;
         for (size_t i = 0; i < tokens->size; i++) {
-
                 node = tokens->tok_args + i;
                 gv_print(node_atr_sample, node, node->atr.shape, node->atr.style, node->atr.height,
                          node->atr.width, node->atr.fixedsize, node->atr.fillcolor,node->atr.fontsize,
@@ -77,8 +75,14 @@ void print_gv_arr_nodes (tokens_t *tokens)
                         log(2, "Paint token with name type");
                 } else if (node->type == NUMBER) {
                         gv_print(node_sample_dec, node, node->val);
-                } else if (node->type == OPERATOR && node->sub_type == 2) {
+                } else if (node->type == OPERATOR && node->sub_type == IF) {
                         gv_print(node_sample_str, node, node->name, "if");
+                } else if (node->type == OPERATOR && node->sub_type == ELSE) {
+                        gv_print(node_sample_str, node, node->name, "else");
+                } else if (node->type == OP_C_BRACKET) {
+                        gv_print(node_sample_str, node, node->name, "op_curve brack");
+                } else if (node->type == CL_C_BRACKET) {
+                        gv_print(node_sample_str, node, node->name, "cl_curve brack");
                 } else if (node->type == ASSIGNMENT) {
                         gv_print(node_sample_str, node, node->name, "assignment");
                 } else {

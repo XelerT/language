@@ -55,7 +55,7 @@ static const char digraph_atr_sample[] = "digraph %s {                          
                                                 \nsplines = %s;                         \
                                                 \n";
 
-static const char node_atr_sample[] = "\nnode%p[shape = \"%s\", style = \"%s\",                                            \
+static const char node_atr_sample[] = "\nnode%p[shape = \"%s\", style = \"%s, filled\",                                            \
 		                                \nheight = %d, width = %d, fixedsize = %s,                               \
 		                                \nfillcolor = \"%s\",                                                    \
 		                                \nfontsize = %d,                                                         \
@@ -116,10 +116,14 @@ void print_gv_nodes (node_t *node)
 
         const char node_sample_var[]  = "node%p [shape = record label = \"{%s | {%s | %d}}\"];\n";  // var_name/type/value
         const char node_sample_ass[]  = "node%p [shape = record label = \"{%s | %s}\"];\n";
+        const char node_sample_ope[]  = "node%p [shape = record label = \"{%s | {%s | %d}}\"];\n";
 
         if (node->type == VARIABLE) {
                 #include "..\include\key_words.kw"
                 log(3, "Graph variable with type: \"%d\", name: \"%s\"", node->sub_type, node->name);
+        } else if (node->type == OPERATOR) {
+                gv_print(node_sample_ope, node, node->name, "operator", node->sub_type);
+                log(2, "Graph operator: %s", node->name);
         } else if (node->type == ASSIGNMENT) {
                 gv_print(node_sample_ass, node, node->name, "assign");
                 log(2, "Graph assignment: %s", node->name);

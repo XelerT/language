@@ -16,9 +16,10 @@ struct variable_t {
 };
 
 struct table_t {
-        variable_t *vars = nullptr;
-        size_t capacity = 0;
-        size_t size     = 0;
+        variable_t *vars    = nullptr;
+        size_t var_capacity = 0;
+        size_t var_size     = 0;
+        size_t if_size      = 0;
 };
 
 int create_asm (tree_t *tree, char *file_name);

@@ -4,6 +4,14 @@
 #include "..\include\config.h"
 #include "..\include\tokens.h"
 
+#define KW(name,type,number) name = number,
+
+enum key_words_types {
+        #include "..\include\key_words.kw"
+};
+
+#undef KW
+
 enum tree_errors {
         NULL_TREE_PTR = 1,
         NULL_ROOT_PTR = 2,

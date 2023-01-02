@@ -29,12 +29,42 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
         if (node->left) {
                 asm_node(node->left, gl_table, output);
         }
-        if (node->right) {
+        if (node->right && node->type != OPERATOR) {
                 asm_node(node->right, gl_table, output);
         }
 
         size_t indent = 0;
         switch (node->type) {
+        case OPERATOR:
+                $
+                if (node->sub_type == IF) {
+                        $
+                        if (node->right->type     == OPERATOR &&
+                            node->right->sub_type == ELSE) {
+                                indent = gl_table->if_size;
+                                fprintf(output, "push 0\n");
+                                fprintf(output, "je end_if_%lld\n", gl_table->if_size++);
+                                $
+                                if (node->right->left) {
+                                        asm_node(node->right->left, gl_table, output);
+                                }
+                                fprintf(output, "jmp end_else_%lld\n", indent);
+                                fprintf(output, "end_if_%lld:\n", indent);
+                                if (node->right->right) {
+                                        asm_node(node->right->right, gl_table, output);
+                                        fprintf(output, "end_else_%lld:\n", indent);
+                                }
+                        } else {
+                                indent = gl_table->if_size;
+                                fprintf(output, "push 0\n");
+                                fprintf(output, "je end_if_%lld\n", gl_table->if_size++);
+                                if (node->right) {
+                                        asm_node(node->right, gl_table, output);
+                                }
+                                fprintf(output, "end_if_%lld:\n", indent);
+                        }
+                }
+                break;
         case NAME:
                 indent = find_var(gl_table, node->name);
                 if (indent == SIZE_T_ERROR) {
@@ -84,7 +114,7 @@ size_t find_var (table_t *table, char *name)
 {
         assert_ptr(table);
 
-        for (size_t i = 0; i < table->size; i++) {
+        for (size_t i = 0; i < table->var_size; i++) {
                 if (!strcmp(name, table->vars[i].name)) {
                         return i;
                 }
@@ -98,7 +128,7 @@ int var_init (table_t *table, int sub_type, char *name)
         assert_ptr(table);
         assert_ptr(name);
 
-        for (size_t i = 0; i < table->size; i++) {
+        for (size_t i = 0; i < table->var_size; i++) {
                 if (!strcmp(name, table->vars[i].name)) {
                         log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s already initialized!</span>", name);
                         return INIT_ERROR;
@@ -108,10 +138,10 @@ int var_init (table_t *table, int sub_type, char *name)
         if (resize_table(table))
                 return REALLOC_ERR;
 
-        table->vars[table->size].val = 0;
-        strcpy(table->vars[table->size].name, name);
-        table->size++;
-        log(2, "Added to var_table \"%s\" variable", table->vars[table->size - 1].name);
+        table->vars[table->var_size].val = 0;
+        strcpy(table->vars[table->var_size].name, name);
+        table->var_size++;
+        log(2, "Added to var_table \"%s\" variable", table->vars[table->var_size - 1].name);
 
         return 0;
 }
@@ -121,8 +151,8 @@ int resize_table (table_t *table)
         assert_ptr(table);
 
         variable_t *temp = nullptr;
-        if (table->size + 10 >= table->capacity) {
-                temp = (variable_t*) realloc(table->vars, sizeof(variable_t) * table->capacity * 2);
+        if (table->var_size + 10 >= table->var_capacity) {
+                temp = (variable_t*) realloc(table->vars, sizeof(variable_t) * table->var_capacity * 2);
                 if (temp) {
                         table->vars = temp;
                 } else {
@@ -145,7 +175,7 @@ int table_ctor (table_t *table, size_t capacity)
                 return NULL_CALLOC;
         }
 
-        table->capacity = capacity;
+        table->var_capacity = capacity;
 
         return 0;
 }

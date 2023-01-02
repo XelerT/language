@@ -129,6 +129,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
                 #include "include\key_words.kw"
                 /*else*/
                         token->type = NAME;
+                log(3, "Got token with name: \"%s\" and type: \"%d\"", token->name, token->sub_type);
         } else if (isdigit(buf[*ip])) {
                 get_number(token, buf, ip);
                 log(2, "DIGIT-TOKEN has type %d", token->type);
