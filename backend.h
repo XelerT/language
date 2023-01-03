@@ -22,6 +22,7 @@ struct table_t {
         size_t if_size      = 0;
         size_t and_size     = 0;
         size_t or_size      = 0;
+        size_t while_size   = 0;
 };
 
 int create_asm (tree_t *tree, char *file_name);

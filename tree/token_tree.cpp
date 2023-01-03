@@ -44,7 +44,7 @@ node_t* get_el (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 if (arg[*tp].type == END_LINE)
                         ++*tp;
                 if (arg[*tp].type != END_FILE && arg[*tp].type != CL_C_BRACKET) {
-                        r_node = get_e(tokens, tp, tree);
+                        r_node = get_el(tokens, tp, tree);
                         log(2, "Type after El2 %d", arg[*tp].type);
                 }
                 edit_temp(&temp_node, &token);
@@ -69,6 +69,8 @@ node_t* get_e (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node = get_t(tokens, tp, tree);
+        log(2, "!!!!!!!!!!!!!!Type after If %s", l_node->name);
+
         node_t *node   = nullptr;
 
         while (arg[*tp].type == ADD_OPERATOR || arg[*tp].type == SUB_OPERATOR) {
@@ -98,6 +100,7 @@ node_t* get_t (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node = get_if(tokens, tp, tree);
+        log(2, "!!!!!!!!!!!!!!Type after If %s", l_node->name);
         node_t *node   = nullptr;
         if (arg[*tp].type == MUL_OPERATOR || arg[*tp].type == DIV_OPERATOR) {
                 node_t temp_node  = {};
@@ -128,25 +131,26 @@ node_t* get_if (const tokens_t *tokens, size_t *tp, tree_t *tree)
         node_t *l_node    = nullptr;
         node_t *if_node   = nullptr;
 
-        if (arg[*tp].type == OPERATOR && arg[*tp].sub_type == IF) {
+        if ((arg[*tp].type == OPERATOR && arg[*tp].sub_type == IF) ||
+            (arg[*tp].type == CYCLE    && arg[*tp].sub_type == WHILE)) {
                 node_t temp_node = {};
                 edit_temp(&temp_node, arg + *tp);
                 if_node = tree_insert(&temp_node);
                 ++*tp;
                 l_node = get_p(tokens, tp, tree);
                 log(3, "------------------Token type in if: %d %s", arg[*tp].type, arg[*tp].name);
-                node_t *temp_r_node = get_p(tokens, tp, tree);
+                node_t *r_node = get_p(tokens, tp, tree);
 
                 if (arg[*tp].type == OPERATOR && arg[*tp].sub_type == ELSE) {
                         if_node->right = get_else(tokens, tp, tree);
-                        if_node->right->left = temp_r_node;
+                        if_node->right->left = r_node;
                 } else {
-                        if_node->right = temp_r_node;
+                        if_node->right = r_node;
                 }
                 if_node->left =  l_node;
                 if_node->atr.fillcolor = "#18D5F5";
         } else {
-                l_node = get_conj(tokens, tp, tree);
+                l_node = get_wh(tokens, tp, tree);
         }
 
         log(2, "Type after If %d", arg[*tp].type);
@@ -175,6 +179,37 @@ node_t* get_else (const tokens_t *tokens, size_t *tp, tree_t *tree)
 
         if (else_node)
                 return else_node;
+        return l_node;
+}
+
+node_t* get_wh (const tokens_t *tokens, size_t *tp, tree_t *tree)
+{
+        assert_ptr(tokens);
+        assert_ptr(tp);
+        assert_ptr(tree);
+
+        node_t *l_node    = nullptr;
+        node_t *while_node   = nullptr;
+
+        if (arg[*tp].type == CYCLE && arg[*tp].sub_type == WHILE) {
+                node_t temp_node = {};
+                edit_temp(&temp_node, arg + *tp);
+                while_node = tree_insert(&temp_node);
+                ++*tp;
+                l_node = get_p(tokens, tp, tree);
+                log(3, "------------------Token type in while: %d %s", arg[*tp].type, arg[*tp].name);
+                node_t *r_node = get_el(tokens, tp, tree);
+
+                while_node->right = r_node;
+                while_node->left  =  l_node;
+                while_node->atr.fillcolor = "#00d8ff";
+        } else {
+                l_node = get_conj(tokens, tp, tree);
+        }
+
+        log(2, "Type after If %d", arg[*tp].type);
+        if (while_node)
+                return while_node;
         return l_node;
 }
 

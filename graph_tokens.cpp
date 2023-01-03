@@ -75,6 +75,8 @@ void print_gv_arr_nodes (tokens_t *tokens)
                         log(2, "Paint token with name type");
                 } else if (node->type == NUMBER) {
                         gv_print(node_sample_dec, node, node->val);
+                } else if (node->type == CYCLE && node->sub_type == WHILE) {
+                        gv_print(node_sample_str, node, node->name, "while");
                 } else if (node->type == OPERATOR && node->sub_type == IF) {
                         gv_print(node_sample_str, node, node->name, "if");
                 } else if (node->type == OPERATOR && node->sub_type == ELSE) {

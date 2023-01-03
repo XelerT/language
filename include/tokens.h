@@ -8,7 +8,7 @@ enum types_t {
         CONST       =  5,
         RELATIVE_OP =  7,
         WORD        =  9,
-        END_FILE    = 14
+        END_FILE    = 255
 };
 
 #define WT(type,val,...)    type = val,

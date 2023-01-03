@@ -29,15 +29,34 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
         assert_ptr(node);
         assert_ptr(gl_table);
 
-        if (node->left && node->type != AND  && node->type != OR) {
+        if (node->left && node->type != AND  && node->type != OR && node->type != CYCLE) {
                 asm_node(node->left, gl_table, output);
         }
-        if (node->right && node->type != OPERATOR && node->type != AND  && node->type != OR) {
+        if (node->right && node->type != OPERATOR  &&
+            node->type != AND  && node->type != OR &&
+            node->type != CYCLE) {
                 asm_node(node->right, gl_table, output);
         }
 
         size_t indent = 0;
         switch (node->type) {
+        case CYCLE:
+                if (node->sub_type == WHILE) {
+                        log(1, "START Asm WHILE");
+                        fprintf(output, "while_%lld:\n", gl_table->while_size);
+                        if (node->left) {
+                                asm_node(node->left, gl_table, output);
+                        }
+                        push(0);
+                        fprintf(output, "je end_while_%lld\n", gl_table->while_size);
+                        if (node->right) {
+                                asm_node(node->right, gl_table, output);
+                        }
+                        fprintf(output, "jmp while_%lld\n", gl_table->while_size);
+                        fprintf(output, "end_while_%lld:\n", gl_table->while_size++);
+                        log(1, "END Asm WHILE");
+                }
+                break;
         case AND:
                 log(1, "START Asm AND");
                 push(0);
