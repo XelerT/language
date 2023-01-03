@@ -16,9 +16,10 @@ node_t* get_g (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tokens);
         assert_ptr(tp);
         assert_ptr(tree);
+        log(1, "<span style = \"color: blue; font-size:30px;\">START GETTING TREE</span>");
 
         node_t *node = get_el(tokens, tp, tree);
-        $s(node->name)
+
         assert(arg[*tp].type == END_FILE);
         return node;
 }
@@ -145,7 +146,7 @@ node_t* get_if (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 if_node->left =  l_node;
                 if_node->atr.fillcolor = "#18D5F5";
         } else {
-                l_node = get_p(tokens, tp, tree);
+                l_node = get_conj(tokens, tp, tree);
         }
 
         log(2, "Type after If %d", arg[*tp].type);
@@ -177,6 +178,32 @@ node_t* get_else (const tokens_t *tokens, size_t *tp, tree_t *tree)
         return l_node;
 }
 
+node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree)
+{
+        assert_ptr(tokens);
+        assert_ptr(tp);
+        assert_ptr(tree);
+
+        node_t *l_node = get_p(tokens, tp, tree);
+        node_t *r_node = nullptr;
+        node_t *node   = nullptr;
+
+        if (arg[*tp].type == AND || arg[*tp].type == OR) {
+                log(2, "Created node with conjanction %s", arg[*tp].name);
+                node_t temp_node = {};
+                edit_temp(&temp_node, arg + *tp);
+                ++*tp;
+                node        = tree_insert(&temp_node);
+                node->left  = l_node;
+                node->right = get_p(tokens, tp, tree);
+                node->atr.fillcolor = "#98B1B5";
+        }
+
+        if (node)
+                return node;
+        return l_node;
+}
+
 node_t* get_p (const tokens_t *tokens, size_t *tp, tree_t *tree)
 {
         assert_ptr(tokens);
@@ -198,6 +225,7 @@ node_t* get_p (const tokens_t *tokens, size_t *tp, tree_t *tree)
         log(2, "Type after P %d", arg[*tp].type);
         return node;
 }
+
 
 node_t* get_a (const tokens_t *tokens, size_t *tp, tree_t *tree)
 {
@@ -268,7 +296,7 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
         case NUMBER:
                 node.data = arg[*tp].val;
                 node.type = NUMBER;
-                node.atr.fillcolor = "white";
+                node.atr.fillcolor = "#CEEFF5";
                 ++*tp;
                 break;
         case NAME:

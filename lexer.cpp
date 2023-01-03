@@ -63,6 +63,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
 {
         assert_ptr(tokens);
         assert_ptr(file_name);
+        log(1, "<span style = \"color: blue; font-size:30px;\">START GETTING TOKENS</span>");
 
         text_t text = {};
         FILE *input = fopen(file_name, "r");
@@ -114,7 +115,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
                                                 log(2, "*****%lld****", type_arg);     \
                                                 break;
 
-#define assign token->name[0] = buf[*ip]
+#define assign(num) token->name[num] = buf[*ip]
 #define ass_type(type_arg) token->type = type_arg
 #define contin ++*ip
 

@@ -14,6 +14,7 @@ int create_asm (tree_t *tree, char *file_name)
 
         FILE *output = fopen(file_name, "w");
 
+        log(1, "<span style = \"color: blue; font-size:30px;\">START GETTING ASSEMLER</span>");
         asm_node(tree->root, &global_table, output);
 
         fprintf(output, "hlt\n");
@@ -21,30 +22,68 @@ int create_asm (tree_t *tree, char *file_name)
         return 0;
 }
 
+#define push(num) fprintf(output, "push %d %s", num, "\n")
+
 int asm_node (node_t *node, table_t *gl_table, FILE *output)
 {
         assert_ptr(node);
         assert_ptr(gl_table);
 
-        if (node->left) {
+        if (node->left && node->type != AND  && node->type != OR) {
                 asm_node(node->left, gl_table, output);
         }
-        if (node->right && node->type != OPERATOR) {
+        if (node->right && node->type != OPERATOR && node->type != AND  && node->type != OR) {
                 asm_node(node->right, gl_table, output);
         }
 
         size_t indent = 0;
         switch (node->type) {
+        case AND:
+                log(1, "START Asm AND");
+                push(0);
+                if (node->left) {
+                        asm_node(node->left, gl_table, output);
+                }
+                push(0);
+                fprintf(output, "je cond_and_1_%lld\n", gl_table->and_size);
+                if (node->right) {
+                        asm_node(node->right, gl_table, output);
+                }
+                push(0);
+                fprintf(output, "je cond_and_2_%lld\n", gl_table->and_size);
+                fprintf(output, "pop\n");
+                fprintf(output, "push 1\n");
+                fprintf(output, "cond_and_1_%lld:\n", gl_table->and_size);
+                fprintf(output, "cond_and_2_%lld:\n", gl_table->and_size++);
+                log(1, "END Asm AND");
+                break;
+        case OR:
+                log(1, "START Asm OR");
+                push(1);
+                if (node->left) {
+                        asm_node(node->left, gl_table, output);
+                }
+                push(0);
+                fprintf(output, "jne cond_or_%lld\n", gl_table->or_size);
+                if (node->right) {
+                        asm_node(node->right, gl_table, output);
+                }
+                push(0);
+                fprintf(output, "jne cond_or_%lld\n", gl_table->or_size);
+                fprintf(output, "pop\n");
+                fprintf(output, "push 0\n");
+                fprintf(output, "cond_or_%lld:\n", gl_table->or_size++);
+                log(1, "END Asm OR");
+                break;
         case OPERATOR:
-                $
                 if (node->sub_type == IF) {
-                        $
+                        log(1, "START Asm IF");
                         if (node->right->type     == OPERATOR &&
                             node->right->sub_type == ELSE) {
+                                log(1, "START Asm ELSE");
                                 indent = gl_table->if_size;
-                                fprintf(output, "push 0\n");
+                                push(0);
                                 fprintf(output, "je end_if_%lld\n", gl_table->if_size++);
-                                $
                                 if (node->right->left) {
                                         asm_node(node->right->left, gl_table, output);
                                 }
@@ -54,24 +93,28 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
                                         asm_node(node->right->right, gl_table, output);
                                         fprintf(output, "end_else_%lld:\n", indent);
                                 }
+                                log(1, "END Asm ELSE");
                         } else {
                                 indent = gl_table->if_size;
-                                fprintf(output, "push 0\n");
+                                push(0);
                                 fprintf(output, "je end_if_%lld\n", gl_table->if_size++);
                                 if (node->right) {
                                         asm_node(node->right, gl_table, output);
                                 }
                                 fprintf(output, "end_if_%lld:\n", indent);
                         }
+                        log(1, "END Asm IF");
                 }
                 break;
         case NAME:
+                log(1, "START Asm NAME");
                 indent = find_var(gl_table, node->name);
                 if (indent == SIZE_T_ERROR) {
                         log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s was not initialized!</span>", node->name);
                         return INIT_ERROR;
                 }
                 fprintf(output, "push [rax + %lld]\n", indent);
+                log(1, "END Asm NAME");
                 break;
         case VARIABLE:
                 if (var_init(gl_table, node->sub_type, node->name))
