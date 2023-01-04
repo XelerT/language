@@ -2,6 +2,12 @@
 #define TOKENS_H
 
 enum types_t {
+        EQUAL       =  1,
+        N_EQUAL     =  2,
+        GREATER     =  3,
+        SMALLER     =  4,
+        EGREATER     =  5,
+        ESMALLER     =  6,
         VARIABLE    =  1,
         NUMBER      =  90,
         FUNC        =  4,
@@ -24,7 +30,7 @@ enum word_types_t {
 
 enum symb_types_t {
         #include "symbles.sym"
-        ASSIGNMENT  =  255
+        ASSIGNMENT  =  254
 };
 
 #undef SYMB

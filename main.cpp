@@ -14,7 +14,7 @@ int main ()
 
         tokens_t tokens = {};
         tokens_ctor(&tokens, 100);
-
+        $
         get_tokens(&tokens, "input.txt");
         $
         arr_graph (&tokens, "tokens_graph.dot", "tokens.png");

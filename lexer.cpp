@@ -104,7 +104,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
                                                 token->sub_type = num;                          \
                                         } else
 
-#define SYMB(key,arg,num,type_arg,is,code) case arg:                                                       \
+#define SYMB(key,arg,num,type_arg,is,code)  case arg:                                                       \
                                                 if (key) {                                                 \
                                                         if (is)                                            \
                                                                 code                                       \
@@ -138,8 +138,12 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
                 switch (buf[*ip]) {
                 #include "include\symbles.sym"
                 default:
+                        $
                         if (!get_relat_op(token, buf, ip)) {
+                                $
+                                $c(buf[*ip])
                                 if (buf[*ip] == '=') {
+                                        $
                                         token->type = ASSIGNMENT;
                                         token->name[0] = buf[*ip];
                                         ++*ip;
@@ -199,34 +203,35 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(token);
         assert_ptr(buf);
         assert_ptr(ip);
-
+        $
         switch (buf[*ip]) {
         case '=':
         case '!':
         case '>':
         case '<':
                 if (buf[*ip + 1] == '=') {
-                        log(1, "??==??");
                         token->name[0] = buf[(*ip)++];
+                        token->name[1] = buf[*ip];
                         token->type = RELATIVE_OP;
                         return '=';
                 }
-                log(1, "-----==-----");
                 break;
         default:
+                $
+                $c(buf[*ip])
                 return 0;
         }
-
+        $
         return 0;
 }
 
 #define SYMB(key,arg,num,type_arg,is,code) case arg:                                                          \
-                                                if (!key) {                                                   \
-                                                        if (is)                                               \
-                                                                code                                          \
-                                                        contin;                                               \
-                                                }                                                             \
-                                                break;
+                                                        if (!key) {                                                   \
+                                                                if (is)                                               \
+                                                                        code                                          \
+                                                                contin;                                               \
+                                                        }                                                             \
+                                                        break;
 
 int get_punct (token_arg_t *token, char *buf, size_t *ip)
 {

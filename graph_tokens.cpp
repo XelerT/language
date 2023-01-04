@@ -45,7 +45,7 @@ void arr_graph (tokens_t *tokens, const char *dot_file_name, const char* png_nam
         print_gv_arr_nodes(tokens);
         tie_gv_arr_nodes(tokens);
 
-        log_pic(3, "<img src=\"%s\" width=\"460\" alt=\"%s\">", png_name, png_name);
+        log_pic(3, "<img src=\"%s\" width=\"1060\" alt=\"%s\">", png_name, png_name);
 
         fprintf(dot_file, "\n}\n}");
         fclose(dot_file);

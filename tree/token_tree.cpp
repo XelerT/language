@@ -166,7 +166,6 @@ node_t* get_else (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node    = nullptr;
-        node_t *line_node = nullptr;
         node_t *else_node = nullptr;
 
         log(3, "------------------Token type in else: %d %s", arg[*tp].type, arg[*tp].name);
@@ -220,13 +219,41 @@ node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node = get_p(tokens, tp, tree);
-        node_t *r_node = nullptr;
         node_t *node   = nullptr;
+        node_t temp_node = {};
 
         if (arg[*tp].type == AND || arg[*tp].type == OR) {
                 log(2, "Created node with conjanction %s", arg[*tp].name);
-                node_t temp_node = {};
                 edit_temp(&temp_node, arg + *tp);
+                ++*tp;
+                node        = tree_insert(&temp_node);
+                node->left  = l_node;
+                node->right = get_p(tokens, tp, tree);
+                node->atr.fillcolor = "#98B1B5";
+        } else if (arg[*tp].type == RELATIVE_OP) {
+                edit_temp(&temp_node, arg + *tp);
+                switch (arg[*tp].name[0]) {
+                case '=':
+                        temp_node.sub_type = EQUAL;
+                        break;
+                case '!':
+                        temp_node.sub_type = N_EQUAL;
+                        break;
+                case '>':
+                        if (arg[*tp].name[1] == '\0')
+                                temp_node.sub_type = GREATER;
+                        else
+                              temp_node.sub_type = EGREATER;
+                        break;
+                case '<':
+                        if (arg[*tp].name[1] == '\0')
+                                temp_node.sub_type = SMALLER;
+                        else
+                              temp_node.sub_type = ESMALLER;
+                        break;
+                default:
+                        log(1, "<span style = \"color: red; font-size:16px;\">!Unknown relative operator!</span>");
+                }
                 ++*tp;
                 node        = tree_insert(&temp_node);
                 node->left  = l_node;

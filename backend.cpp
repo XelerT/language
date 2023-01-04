@@ -4,7 +4,7 @@
 #include "tree\tree.h"
 #include "backend.h"
 
-int create_asm (tree_t *tree, char *file_name)
+int create_asm (tree_t *tree, const char *file_name)
 {
         assert_ptr(tree);
 
@@ -29,17 +29,70 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
         assert_ptr(node);
         assert_ptr(gl_table);
 
-        if (node->left && node->type != AND  && node->type != OR && node->type != CYCLE) {
+        if (node->left && node->type != AND  && node->type != OR &&
+            node->type != CYCLE && node->type != RELATIVE_OP) {
                 asm_node(node->left, gl_table, output);
         }
         if (node->right && node->type != OPERATOR  &&
             node->type != AND  && node->type != OR &&
-            node->type != CYCLE) {
+            node->type != CYCLE && node->type != RELATIVE_OP) {
                 asm_node(node->right, gl_table, output);
         }
 
         size_t indent = 0;
         switch (node->type) {
+        case RELATIVE_OP:
+                push(1);
+                if (node->left) {
+                        asm_node(node->left, gl_table, output);
+                }
+                if (node->right) {
+                        asm_node(node->right, gl_table, output);
+                }
+                switch (node->sub_type) {
+                case EQUAL:
+                        log(1, "START Asm EQUAL");
+                        fprintf(output, "je equal\n");
+                        fprintf(output, "pop\n");
+                        push(0);
+                        fprintf(output, "equal:\n");
+                        break;
+                case N_EQUAL:
+                        log(1, "START Asm N_EQUAL");
+                        fprintf(output, "jne n_equal\n");
+                        fprintf(output, "pop\n");
+                        push(0);
+                        fprintf(output, "n_equal:\n");
+                        break;
+                case GREATER:
+                        log(1, "START Asm GREATER");
+                        fprintf(output, "ja greater\n");
+                        fprintf(output, "pop\n");
+                        push(0);
+                        fprintf(output, "greater:\n");
+                        break;
+                case SMALLER:
+                        log(1, "START Asm SMALLER");
+                        fprintf(output, "jb smaller\n");
+                        fprintf(output, "pop\n");
+                        push(0);
+                        fprintf(output, "smaller:\n");
+                        break;
+                case ESMALLER:
+                        log(1, "START Asm ESMALLER");
+                        fprintf(output, "jbe esmaller\n");
+                        fprintf(output, "pop\n");
+                        push(0);
+                        fprintf(output, "esmaller:\n");
+                        break;
+                case EGREATER:
+                        log(1, "START Asm EGREATER");
+                        fprintf(output, "jae egreater\n");
+                        fprintf(output, "pop\n");
+                        push(0);
+                        fprintf(output, "egreater:\n");
+                        break;
+                }
         case CYCLE:
                 if (node->sub_type == WHILE) {
                         log(1, "START Asm WHILE");

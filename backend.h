@@ -25,7 +25,7 @@ struct table_t {
         size_t while_size   = 0;
 };
 
-int create_asm (tree_t *tree, char *file_name);
+int create_asm (tree_t *tree, const char *file_name);
 int asm_node (node_t *node, table_t *gl_table, FILE *output);
 int var_init (table_t *table, int sub_type, char *name);
 int resize_table (table_t *table);
