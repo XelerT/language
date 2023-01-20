@@ -49,6 +49,7 @@ int asm_or (FILE *output, table_t *gl_table, node_t *node);
 int asm_operator (FILE *output, table_t *gl_table, node_t *node);
 int func_init (FILE *output, node_t *node, table_t *table);
 int asm_func (FILE *output, node_t *node, table_t *table);
+size_t count_args(node_t *node, table_t *table);
 
 
 #endif /*BACKEND_H*/

@@ -9,7 +9,7 @@ int create_asm (tree_t *tree, const char *file_name)
         assert_ptr(tree);
 
         table_t global_table = {};
-        if (table_ctor(&global_table, 20, 20))
+        if (table_ctor(&global_table, DEFAULT_N_VARS, DEFAULT_N_FUNCS))
                 return NULL_CALLOC;
 
         FILE *output = fopen(file_name, "w");
@@ -39,7 +39,7 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
 
         if (node->left && node->type != AND  && node->type != OR &&
             node->type != CYCLE && node->type != RELATIVE_OP     &&
-            node->type != FUNC_INIT) {
+            node->type != FUNC_INIT && node->type != FUNC) {
                 asm_node(node->left, gl_table, output);
         }
         if (node->right && node->type != OPERATOR            &&
@@ -52,6 +52,7 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
         size_t indent = 0;
         switch (node->type) {
         case FUNC:
+                asm_node(node->left, gl_table, output);
                 fprintf(output, "call %s\n", node->name);
                 break;
         case STAFF:
@@ -406,6 +407,7 @@ int func_init (FILE *output, node_t *node, table_t *table)
         log(2, "Added to func_table \"%s\" function", table->funcs[table->func_size - 1].name);
 
         asm_func(output, node, table);
+
         return 0;
 }
 
@@ -416,8 +418,18 @@ int asm_func (FILE *output, node_t *node, table_t *table)
 
         resize_table(table);
 
+        table_t loc_table = {};
+        table_ctor(&loc_table, DEFAULT_N_VARS, DEFAULT_N_FUNCS);
+        loc_table.var_size = count_args(node, &loc_table);
+
         fprintf(output, "jmp skip%lld \n", table->func_size);
         fprintf(output, "%s:\n", node->name);
+
+        asm_node(node->left, table, output);
+
+        for (size_t i = loc_table.var_size - 1; i > 0; i--) {
+                fprintf(output, "pop [rbx + %lld]\n", i);
+        }
 
         asm_node(node->right, table, output);
 
@@ -426,6 +438,24 @@ int asm_func (FILE *output, node_t *node, table_t *table)
 
         log(2, "Assmed \"%s\" function", node->name);
         return 0;
+}
+
+size_t count_args(node_t *node, table_t *table)
+{
+        assert_ptr(node);
+        assert_ptr(table);
+
+        size_t count = 0;
+
+        if (node->left)
+                count += count_args(node->left,  table);
+        if (node->right)
+                count += count_args(node->right, table);
+
+        if (node->type == VARIABLE)
+                count++;
+
+        return count;
 }
 
 #undef push

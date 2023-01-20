@@ -169,15 +169,10 @@ int get_number(token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(buf);
         assert_ptr(ip);
 
-        elem_t rev_val = 0;
-        for (int i = 0; isdigit(buf[*ip]); i++) {
-                rev_val += (buf[*ip] - '0') * (elem_t) pow(10, i);
-                ++*ip;
-        }
         elem_t val = 0;
-        for (int i = 0; rev_val; i++) {
-                val = val * 10 + (rev_val % 10);
-                rev_val /= 10;
+        for (int i = 0; isdigit(buf[*ip]); i++) {
+                val = val * 10 + (buf[*ip] - '0');
+                ++*ip;
         }
 
         token->val = val;

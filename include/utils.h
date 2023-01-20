@@ -2,6 +2,8 @@
 #define UTILS_H
 
 const int MAX_NAME_LENGTH = 50;
+const int DEFAULT_N_VARS  = 20;
+const int DEFAULT_N_FUNCS = 20;
 
 struct graph_node_atr_t {
         const char *shape = "rectangle";

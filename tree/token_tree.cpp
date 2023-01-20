@@ -30,7 +30,9 @@ node_t* get_el (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tp);
         assert_ptr(tree);
 
-        node_t *l_node = get_e(tokens, tp, tree);
+        node_t *l_node = nullptr;
+        if (arg[*tp].type != END_LINE)
+                l_node = get_e(tokens, tp, tree);
         node_t *node   = nullptr;
         node_t temp_node  = {};
         token_arg_t token = {
@@ -71,7 +73,7 @@ node_t* get_e (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node = get_t(tokens, tp, tree);
-        log(2, "!!!!!!!!!!!!!!Type after If %s", l_node->name);
+        log(2, "Type after If %s", l_node->name);
 
         node_t *node   = nullptr;
 
@@ -102,7 +104,7 @@ node_t* get_t (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node = get_if(tokens, tp, tree);
-        log(2, "!!!!!!!!!!!!!!Type after If %s", l_node->name);
+        log(2, "Type after If %s", l_node->name);
         node_t *node   = nullptr;
         if (arg[*tp].type == MUL_OPERATOR || arg[*tp].type == DIV_OPERATOR) {
                 node_t temp_node  = {};
@@ -140,7 +142,7 @@ node_t* get_if (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 if_node = tree_insert(&temp_node);
                 ++*tp;
                 l_node = get_p(tokens, tp, tree);
-                log(3, "------------------Token type in if: %d %s", arg[*tp].type, arg[*tp].name);
+                log(3, "Token type in if: %d %s", arg[*tp].type, arg[*tp].name);
                 node_t *r_node = get_p(tokens, tp, tree);
 
                 if (arg[*tp].type == OPERATOR && arg[*tp].sub_type == ELSE) {
@@ -170,7 +172,7 @@ node_t* get_else (const tokens_t *tokens, size_t *tp, tree_t *tree)
         node_t *l_node    = nullptr;
         node_t *else_node = nullptr;
 
-        log(3, "------------------Token type in else: %d %s", arg[*tp].type, arg[*tp].name);
+        log(3, "Token type in else: %d %s", arg[*tp].type, arg[*tp].name);
         node_t temp_node = {};
         edit_temp(&temp_node, arg + *tp);
         ++*tp;
@@ -198,7 +200,7 @@ node_t* get_wh (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 while_node = tree_insert(&temp_node);
                 ++*tp;
                 l_node = get_p(tokens, tp, tree);
-                log(3, "------------------Token type in while: %d %s", arg[*tp].type, arg[*tp].name);
+                log(3, "Token type in while: %d %s", arg[*tp].type, arg[*tp].name);
                 node_t *r_node = get_el(tokens, tp, tree);
 
                 while_node->right = r_node;
@@ -393,6 +395,7 @@ node_t* get_func (const tokens_t *tokens, size_t *tp, tree_t *tree)
                         node->right = get_cb(tokens, tp, tree);
         } else if (arg[*tp].type == NAME && arg[*tp + 1].type == OP_BRACKET) {
                 node_t temp_node = {};
+
                 edit_temp(&temp_node, arg + *tp);
                 temp_node.type = FUNC;
                 ++*tp;
@@ -400,8 +403,7 @@ node_t* get_func (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 temp_node.atr.fillcolor = "#D681C2";
 
                 node        = tree_insert(&temp_node);
-                node->left  = get_p(tokens, tp, tree);
-                node->right = get_el(tokens, tp, tree);
+                node->left  = get_p (tokens, tp, tree);
         } else {
                 node        = get_n(tokens, tp, tree);
         }
