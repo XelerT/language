@@ -133,6 +133,9 @@ void print_gv_nodes (node_t *node)
         } else if (node->type == NAME) {
                 gv_print(node_sample_ass, node, node->name, "name");
                 log(3, "Graph name %s type \"%d\"", node->name, node->type);
+        } else if (node->type == STAFF) {
+                gv_print(node_sample_str, node, "return");
+                log(1, "Graph return");
         } else {
                 gv_print(node_sample_str, node, node->name);
                 log(3, "Graph else option %s type \"%d\"", node->name, node->type);

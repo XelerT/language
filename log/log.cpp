@@ -16,6 +16,7 @@ int log_init (const char *log_file_name)
         if (setvbuf(LOG_FILE, nullptr, _IONBF, 0))
                 return VBUF_ERR;
         fprintf(LOG_FILE, "<pre>\n");
+        fprintf(LOG_FILE, "<meta charset=\"utf-8\">\n");
         fprintf(LOG_FILE, "<body style=\"background-color:#B4D1CC;\">\n");
 
         return 0;

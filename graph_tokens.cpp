@@ -67,12 +67,15 @@ void print_gv_arr_nodes (tokens_t *tokens)
 
                 const char node_sample_data_t[]  = "node%p [shape = record label = \"{%s | {%s | %d}}\"];\n";
 
-                if (node->type == DATA_TYPE) {
+                if (node->type == STAFF && node->sub_type == RETURN) {
+                        gv_print(node_sample_str, node, node->name, "return");
+                        log(1, "Paint return");
+                } else if (node->type == DATA_TYPE) {
                         gv_print(node_sample_data_t, node, node->name, "data type", node->sub_type);
-                        log(2, "Paint token with DATA_TYPE type");
+                        log(1, "Paint token with DATA_TYPE type");
                 } else if (node->type == NAME) {
                         gv_print(node_sample_str, node, node->name, "name type");
-                        log(2, "Paint token with name type");
+                        log(1, "Paint token with name type");
                 } else if (node->type == NUMBER) {
                         gv_print(node_sample_dec, node, node->val);
                 } else if (node->type == CYCLE && node->sub_type == WHILE) {

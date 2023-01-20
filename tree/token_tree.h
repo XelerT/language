@@ -13,8 +13,10 @@ node_t* get_else (const tokens_t *tokens, size_t *tp, tree_t *tree);
 node_t* get_wh   (const tokens_t *tokens, size_t *tp, tree_t *tree);
 node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree);
 node_t* get_p    (const tokens_t *tokens, size_t *tp, tree_t *tree);
+node_t* get_ne   (const tokens_t *tokens, size_t *tp, tree_t *tree);
 node_t* get_a    (const tokens_t *tokens, size_t *tp, tree_t *tree);
 node_t* get_cb   (const tokens_t *tokens, size_t *tp, tree_t *tree);
+node_t* get_func (const tokens_t *tokens, size_t *tp, tree_t *tree);
 node_t* get_n    (const tokens_t *tokens, size_t *tp, tree_t *tree);
 
 void edit_temp (node_t *temp_node, token_arg_t *token);

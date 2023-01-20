@@ -1,21 +1,13 @@
 #ifndef TOKENS_H
 #define TOKENS_H
 
+#define TYPE(name,num) name = num,
+
 enum types_t {
-        EQUAL       =  1,
-        N_EQUAL     =  2,
-        GREATER     =  3,
-        SMALLER     =  4,
-        EGREATER     =  5,
-        ESMALLER     =  6,
-        VARIABLE    =  1,
-        NUMBER      =  90,
-        FUNC        =  4,
-        CONST       =  5,
-        RELATIVE_OP =  7,
-        WORD        =  9,
-        END_FILE    = 255
+        #include "types.tp"
 };
+
+#undef TYPE
 
 #define WT(type,val,...)    type = val,
 
@@ -36,9 +28,9 @@ enum symb_types_t {
 #undef SYMB
 
 struct token_arg_t {
-        unsigned char   type     = 0;
-        char   sub_type = 0;
-        elem_t val      = 0;
+        unsigned int type = 0;
+        char   sub_type   = 0;
+        elem_t val        = 0;
         char name[MAX_NAME_LENGTH] = {'\0'};
 
         graph_node_atr_t atr = {};
@@ -46,8 +38,8 @@ struct token_arg_t {
 
 struct tokens_t {
         token_arg_t *tok_args = nullptr;
-        size_t capacity = 0;
-        size_t size     = 0;
+        size_t capacity       = 0;
+        size_t size           = 0;
 };
 
 #endif /*TOKENS_H*/

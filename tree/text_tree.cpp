@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <assert.h>
+#include <locale.h>
 
 #include "text_tree.h"
 
@@ -30,6 +31,8 @@ int get_text (FILE *input, text_t *text, const char *file_name)
         }
 
         n_chars = fread(buf, sizeof(char), file.st_size, input);
+        setlocale(LC_CTYPE, "be_BY.UTF-8");
+        log(3, "%d ўўўўўўўў %d", isalpha(*buf), *buf);
         text->n_chars = n_chars;
 
         text->buf = buf;

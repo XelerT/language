@@ -30,8 +30,8 @@ node_t* tree_insert (const node_t *temp_node)
         node->sub_type = temp_node->sub_type;
         strcpy(node->name, temp_node->name);
         node->new_node = 1;
-        node->left = nullptr;
-        node->right = nullptr;
+        node->left = temp_node->left;
+        node->right = temp_node->right;
 
         return node;
 }

@@ -45,6 +45,7 @@ CFLAGS= -Wshadow    			\
 	-D_EJUDGE_CLIENT_SIDE
 
 all:
+	@ cls
 	@ g++ -o $(OUTPUT) $(CFLAGS) $(CFILES)
 def:
 	@g++ -E $(OUTPUT) $(CFLAGS) $(CFILES) >> defines.txt

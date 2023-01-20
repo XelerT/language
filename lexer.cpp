@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <locale.h>
 #include "include\lexer.h"
 #include "log\log.h"
 #include "include\graph_tokens.h"
@@ -138,6 +139,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
                 switch (buf[*ip]) {
                 #include "include\symbles.sym"
                 default:
+                        log(1, "here");
                         $
                         if (!get_relat_op(token, buf, ip)) {
                                 $

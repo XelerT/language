@@ -23,24 +23,15 @@ enum errors {
         NULL_FILE_PTR = -2
 };
 
-enum operator_t {
-        ADD = '+',
-        SUB = '-',
-        MUL = '*',
-        DIV = '/',
-        POW = '^',
-        ASS = '='
-};
-
 struct node_t {
-        node_t *left           = nullptr;
-        node_t *right          = nullptr;
-        size_t indx            =       0;
-        int new_node           =       0;
-        elem_t data            =       0;
-        unsigned char type     =       0;
-        char sub_type          =       0;
-        char name[MAX_NAME_LENGTH] = {};
+        node_t *left               = nullptr;
+        node_t *right              = nullptr;
+        size_t indx                =       0;
+        int new_node               =       0;
+        elem_t data                =       0;
+        unsigned int  type         =       0;
+        char sub_type              =       0;
+        char name[MAX_NAME_LENGTH] =      {};
 
         graph_node_atr_t atr = {};
 };

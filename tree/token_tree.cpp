@@ -39,7 +39,9 @@ node_t* get_el (const tokens_t *tokens, size_t *tp, tree_t *tree)
         };
         node_t *r_node = nullptr;
         log(2, "Type in el %d", arg[*tp].type);
+        $
         while (arg[*tp].type == END_LINE || arg[*tp - 1].type == CL_C_BRACKET) {
+                $
                 log(3, "**Token type in EL: %d %s", arg[*tp].type, arg[*tp].name);
                 if (arg[*tp].type == END_LINE)
                         ++*tp;
@@ -281,11 +283,35 @@ node_t* get_p (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 assert(arg[*tp].type == CL_BRACKET);
                 ++*tp;
         } else {
-                node = get_a(tokens, tp, tree);
+                node = get_ne(tokens, tp, tree);
         }
 
         log(2, "Type after P %d", arg[*tp].type);
         return node;
+}
+
+node_t* get_ne (const tokens_t *tokens, size_t *tp, tree_t *tree)
+{
+        assert_ptr(tokens);
+        assert_ptr(tp);
+        assert_ptr(tree);
+
+        node_t *l_node = get_a(tokens, tp, tree);
+        node_t *node   = nullptr;
+
+        if (arg[*tp].type == NEXT_ELEM) {
+                node_t temp_node = {};
+                edit_temp(&temp_node, arg + *tp);
+                ++*tp;
+                node = tree_insert(&temp_node);
+                node->right = get_e(tokens, tp, tree);
+                log(2, "In NEXT_ELEM after E: %d", arg[*tp].type);
+                node->left = l_node;
+        }
+
+        if (node)
+                return node;
+        return l_node;
 }
 
 
@@ -337,10 +363,50 @@ node_t* get_cb (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 assert(arg[*tp].type == CL_C_BRACKET);
                 ++*tp;
         } else {
-                node = get_n(tokens, tp, tree);
+                node = get_func(tokens, tp, tree);
         }
 
         log(2, "Type after cb %d", arg[*tp].type);
+        return node;
+}
+
+node_t* get_func (const tokens_t *tokens, size_t *tp, tree_t *tree)
+{
+        assert_ptr(tokens);
+        assert_ptr(tp);
+        assert_ptr(tree);
+
+        node_t *node   = nullptr;
+
+        if (arg[*tp].type     == DATA_TYPE && arg[*tp + 1].type == NAME &&
+            arg[*tp + 2].type == OP_BRACKET) {
+                        node_t temp_node = {};
+                        temp_node.sub_type = arg[*tp].sub_type;
+                        strcpy(temp_node.name, arg[*tp + 1].name);
+                        temp_node.type = FUNC_INIT;
+                        *tp += 2;
+                        log(3, "Created function with type: \"%d\", name: \"%s\"", temp_node.sub_type, temp_node.name);
+                        temp_node.atr.fillcolor = "#EB8CD5";
+
+                        node = tree_insert(&temp_node);
+                        node->left  = get_p(tokens, tp, tree);
+                        node->right = get_cb(tokens, tp, tree);
+        } else if (arg[*tp].type == NAME && arg[*tp + 1].type == OP_BRACKET) {
+                node_t temp_node = {};
+                edit_temp(&temp_node, arg + *tp);
+                temp_node.type = FUNC;
+                ++*tp;
+                log(2, "Function %s called", temp_node.name);
+                temp_node.atr.fillcolor = "#D681C2";
+
+                node        = tree_insert(&temp_node);
+                node->left  = get_p(tokens, tp, tree);
+                node->right = get_el(tokens, tp, tree);
+        } else {
+                node        = get_n(tokens, tp, tree);
+        }
+
+        log(2, "Type after function %d", arg[*tp].type);
         return node;
 }
 
@@ -352,34 +418,47 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
 
         size_t prev_tp = *tp;
         node_t node = {};
+        int recycle = 1;
         log(2, "GET_N token type: %d", arg[*tp].type);
 
-        switch (arg[*tp].type) {
-        case NUMBER:
-                node.data = arg[*tp].val;
-                node.type = NUMBER;
-                node.atr.fillcolor = "#CEEFF5";
-                ++*tp;
-                break;
-        case NAME:
-                strcpy(node.name, arg[*tp].name);
-                node.type = NAME;
-                ++*tp;
-                break;
-        case DATA_TYPE:
-                if (arg[*tp + 1].type == NAME) {
-                        node.type = VARIABLE;
-                        node.sub_type = arg[*tp].sub_type;
-                        strcpy(node.name, arg[*tp + 1].name);
-                        *tp += 2;
-                        log(3, "Created variable with type: \"%d\", name: \"%s\"", node.sub_type, node.name);
-                        node.atr.fillcolor = "#93F558";
-                } else {
-                        log(1, "<span style = \"color: red; font-size:16px;\">!No variable name after data type!</span>");
+        while (recycle) {
+                switch (arg[*tp].type) {
+                case NUMBER:
+                        node.data = arg[*tp].val;
+                        node.type = NUMBER;
+                        node.atr.fillcolor = "#CEEFF5";
+                        ++*tp;
+                        break;
+                case NAME:
+                        strcpy(node.name, arg[*tp].name);
+                        node.type = NAME;
+                        ++*tp;
+                        break;
+                case DATA_TYPE:
+                        if (arg[*tp + 1].type == NAME) {
+                                node.sub_type = arg[*tp].sub_type;
+                                strcpy(node.name, arg[*tp + 1].name);
+                                node.type = VARIABLE;
+                                *tp += 2;
+                                log(3, "Created variable with type: \"%d\", name: \"%s\"", node.sub_type, node.name);
+                                node.atr.fillcolor = "#93F558";
+                        } else {
+                                log(1, "<span style = \"color: red; font-size:16px;\">!No variable name after data type!</span>");
+                        }
+                        break;
+                case STAFF:
+                        node.type = STAFF;
+                        if (arg[*tp].sub_type == RETURN) {
+                                node.sub_type = RETURN;
+                                log(1, "Created return");
+                                ++*tp;
+                                node.right = get_p(tokens, tp, tree);
+                        }
+                        break;
+                default:
+                        recycle = 0;
+                        log(3, "Default case: token type: \"%d\", name: \"%s\"", arg[*tp].type, arg[*tp].name);
                 }
-                break;
-        default:
-                log(1, "Default case: token type: \"%d\", name: \"%s\"", arg[*tp].type, arg[*tp].name);
         }
 
         log(2, "Type after N %d", arg[*tp].type);
