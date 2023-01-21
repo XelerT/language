@@ -11,12 +11,12 @@ int create_asm (tree_t *tree, const char *file_name)
         table_t global_table = {};
         if (table_ctor(&global_table, DEFAULT_N_VARS, DEFAULT_N_FUNCS))
                 return NULL_CALLOC;
-
+$
         FILE *output = fopen(file_name, "w");
 
         log(1, "<span style = \"color: blue; font-size:30px;\">START WRITING ASSEMLER</span>");
-        asm_node(tree->root, &global_table, output);
-
+        base_asm_node(tree->root, &global_table, nullptr, output);
+$
         fprintf(output, "hlt\n");
         table_dtor(&global_table);
         fclose(output);
@@ -32,10 +32,14 @@ int create_asm (tree_t *tree, const char *file_name)
                                 fprintf(output, "%s:\n", #name);                                  \
                                 break;
 
-int asm_node (node_t *node, table_t *gl_table, FILE *output)
+#define asm_node(node,gl_table,output) base_asm_node(node, gl_table, loc_table, output);
+#define switch_table(arg) loc_table.vars ? loc_table.arg: gl_table->arg
+
+int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *output)
 {
         assert_ptr(node);
         assert_ptr(gl_table);
+        assert_ptr(output);
 
         if (node->left && node->type != AND  && node->type != OR &&
             node->type != CYCLE && node->type != RELATIVE_OP     &&
@@ -50,6 +54,7 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
         }
 
         size_t indent = 0;
+
         switch (node->type) {
         case FUNC:
                 asm_node(node->left, gl_table, output);
@@ -62,6 +67,8 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
                 break;
         case FUNC_INIT:
                 func_init(output, node, gl_table);
+
+                log(2, "Initialized \"%s\" function", node->name);
                 break;
         case RELATIVE_OP:
                 push(1);
@@ -110,17 +117,25 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
                         return INIT_ERROR;
                 }
                 fprintf(output, "push [rax + %lld]\n", indent);
+
                 log(1, "END Asm NAME");
                 break;
         case VARIABLE:
-                if (var_init(gl_table, node->sub_type, node->name))
+                if (var_init(gl_table, loc_table ? loc_table: nullptr, node->sub_type, node->name)) {
                         return INIT_ERROR;
-
+                }
                 log(2, "Initialized \"%s\" variable", node->name);
                 break;
         case ASSIGNMENT:
-                indent = find_var(gl_table, node->left->name);
-                fprintf(output, "pop [rax + %lld]\n", indent);
+                indent = find_var(gl_table,  node->left->name);
+                if (indent == SIZE_T_ERROR) {
+                        indent = find_var(loc_table, node->left->name);
+                }
+                if (indent == SIZE_T_ERROR) {
+                        log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s was not initialized!</span>", node->left->name);
+                        return INIT_ERROR;
+                }
+                fprintf(output, "pop [%s + %lld]\n", loc_table ? "rbx": "rax", indent);
 
                 log(2, "Assigned to rax + %d", indent);
                 break;
@@ -150,13 +165,15 @@ int asm_node (node_t *node, table_t *gl_table, FILE *output)
                 log(1, "div");
                 break;
         default:
-                log(1, "Default switch case in assembling");
+                log(2, "Default switch case in assembling(%s)", node->name);
         }
 
         return 0;
 }
 
 #undef rel_op
+#undef asm_node
+#define asm_node(node,gl_table,output) base_asm_node(node, gl_table, loc_table.vars ? &loc_table: nullptr, output);
 
 size_t find_var (table_t *table, char *name)
 {
@@ -171,97 +188,38 @@ size_t find_var (table_t *table, char *name)
         return SIZE_T_ERROR;
 }
 
-int var_init (table_t *table, int sub_type, char *name)
+int var_init (table_t *gl_table, table_t *loc_table, int sub_type, char *name)
 {
-        assert_ptr(table);
+        assert_ptr(gl_table);
         assert_ptr(name);
 
-        for (size_t i = 0; i < table->var_size; i++) {
-                if (!strcmp(name, table->vars[i].name)) {
-                        log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s already initialized!</span>", name);
+        for (size_t i = 0; i < gl_table->var_size; i++) {
+                if (!strcmp(name, gl_table->vars[i].name)) {
+                        log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s already initialized as global variable!</span>", name);
                         return INIT_ERROR;
                 }
+                if (resize_table(gl_table))
+                        return REALLOC_ERR;
         }
-
-        if (resize_table(table))
-                return REALLOC_ERR;
-
-        table->vars[table->var_size].val = 0;
-        strcpy(table->vars[table->var_size].name, name);
-        table->var_size++;
-        log(2, "Added to var_table \"%s\" variable", table->vars[table->var_size - 1].name);
-
-        return 0;
-}
-
-int resize_table (table_t *table)
-{
-        assert_ptr(table);
-
-        variable_t *temp = nullptr;
-        if (table->var_size + 10 >= table->var_cap) {
-                temp = (variable_t*) realloc(table->vars, sizeof(variable_t) * table->var_cap * 2);
-                if (temp) {
-                        table->vars = temp;
-                } else {
-                        log(1, "<span style = \"color: red; font-size:16px;\">!Realloc returned null!</span>");
+        if (loc_table) {
+                for (size_t i = 0; i < loc_table->var_size; i++) {
+                        if (!strcmp(name, loc_table->vars[i].name)) {
+                                log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s already initialized as local variable!</span>", name);
+                                return INIT_ERROR;
+                        }
+                }
+                if (resize_table(loc_table)) {
                         return REALLOC_ERR;
                 }
-                log(1, "<span style = \"color: green; font-size:10px;\">Resized var_table</span>");
-        }
-
-        function_t *temp2 = nullptr;
-        if (table->func_size + 10 >= table->func_cap) {
-                temp2 = (function_t*) realloc(table->funcs, sizeof(function_t) * table->func_cap * 2);
-                if (temp2) {
-                        table->funcs = temp2;
-                } else {
-                        log(1, "<span style = \"color: red; font-size:16px;\">!Realloc returned null!</span>");
-                        return REALLOC_ERR;
-                }
-                log(1, "<span style = \"color: green; font-size:10px;\">Resized func_table</span>");
-        }
-
-        return 0;
-}
-
-int table_ctor (table_t *table, size_t var_cap, size_t func_cap)
-{
-        assert_ptr(table);
-
-        table->vars = (variable_t*) calloc(var_cap, sizeof(variable_t));
-        if (!table->vars) {
-                log(1, "Calloc for variable table if NULL");
-                return NULL_CALLOC;
-        }
-        table->var_cap = var_cap;
-
-
-        table->funcs = (function_t*) calloc(func_cap, sizeof(function_t));
-        if (!table->funcs) {
-                log(1, "Calloc for function table if NULL");
-                return NULL_CALLOC;
-        }
-        table->func_cap = func_cap;
-
-        return 0;
-}
-
-int table_dtor (table_t *table)
-{
-        assert_ptr(table);
-
-        if (table->vars) {
-                free(table->vars);
-                table->vars = nullptr;
+                loc_table->vars[loc_table->var_size].val = 0;
+                strcpy(loc_table->vars[loc_table->var_size].name, name);
+                loc_table->var_size++;
+                log(2, "Added to local var_table \"%s\" variable", loc_table->vars[loc_table->var_size - 1].name);
         } else {
-                log(1, "<span style = \"color: orange; font-size:14px;\"> Destructor of table tried to free variables pointer </span>");
-        }
-        if (table->funcs) {
-                free(table->funcs);
-                table->funcs = nullptr;
-        } else {
-                log(1, "<span style = \"color: orange; font-size:14px;\"> Destructor of table tried to free functions pointer </span>");
+                gl_table->vars[gl_table->var_size].val = 0;
+                strcpy(gl_table->vars[gl_table->var_size].name, name);
+                gl_table->var_size++;
+                log(2, "Added to global var_table \"%s\" variable", gl_table->vars[gl_table->var_size - 1].name);
         }
 
         return 0;
@@ -274,19 +232,25 @@ int asm_while (FILE *output, table_t *gl_table, node_t *node)
         assert_ptr(node);
 
         log(1, "START Asm WHILE");
-        fprintf(output, "while_%lld:\n", gl_table->while_size);
+
+        table_t loc_table = {};
+        if (count_args(node, gl_table)) {
+                table_ctor(&loc_table, DEFAULT_N_VARS, 0);
+        }
+        fprintf(output, "while_%lld:\n", switch_table(while_size));
         if (node->left) {
                asm_node(node->left, gl_table, output);
         }
         push(0);
-        fprintf(output, "je end_while_%lld\n", gl_table->while_size);
+        fprintf(output, "je end_while_%lld\n", switch_table(while_size));
         if (node->right) {
                 asm_node(node->right, gl_table, output);
         }
-        fprintf(output, "jmp while_%lld\n", gl_table->while_size);
-        fprintf(output, "end_while_%lld:\n", gl_table->while_size++);
-        log(1, "END Asm WHILE");
+        fprintf(output, "jmp while_%lld\n",  switch_table(while_size));
+        fprintf(output, "end_while_%lld:\n", switch_table(while_size++));
 
+        log(1, "END Asm WHILE");
+        table_dtor(&loc_table);
         return 0;
 }
 
@@ -295,8 +259,10 @@ int asm_and (FILE *output, table_t *gl_table, node_t *node)
         assert_ptr(output);
         assert_ptr(gl_table);
         assert_ptr(node);
+
         log(1, "START Asm AND");
 
+        table_t loc_table = {};
         push(0);
         if (node->left) {
                 asm_node(node->left, gl_table, output);
@@ -322,8 +288,10 @@ int asm_or (FILE *output, table_t *gl_table, node_t *node)
         assert_ptr(output);
         assert_ptr(gl_table);
         assert_ptr(node);
+
         log(1, "START Asm OR");
 
+        table_t loc_table = {};
         push(1);
         if (node->left) {
                 asm_node(node->left, gl_table, output);
@@ -350,6 +318,9 @@ int asm_operator (FILE *output, table_t *gl_table, node_t *node)
         assert_ptr(node);
 
         size_t indent = 0;
+        table_t loc_table = {};
+        if (count_args(node, gl_table))
+                table_ctor(&loc_table, DEFAULT_N_VARS, DEFAULT_N_FUNCS);
 
         if (node->sub_type == IF) {
                 log(1, "START Asm IF");
@@ -357,9 +328,9 @@ int asm_operator (FILE *output, table_t *gl_table, node_t *node)
                     node->right->sub_type == ELSE) {
                         log(1, "START Asm ELSE");
 
-                        indent = gl_table->if_size;
+                        indent = switch_table(if_size);
                         push(0);
-                        fprintf(output, "je end_if_%lld\n", gl_table->if_size++);
+                        fprintf(output, "je end_if_%lld\n", switch_table(if_size++));
                         if (node->right->left) {
                                 asm_node(node->right->left, gl_table, output);
                         }
@@ -371,9 +342,9 @@ int asm_operator (FILE *output, table_t *gl_table, node_t *node)
                         }
                         log(1, "END Asm ELSE");
                 } else {
-                        indent = gl_table->if_size;
+                        indent = switch_table(if_size);
                         push(0);
-                        fprintf(output, "je end_if_%lld\n", gl_table->if_size++);
+                        fprintf(output, "je end_if_%lld\n", switch_table(if_size++));
                         if (node->right) {
                                 asm_node(node->right, gl_table, output);
                         }
@@ -382,6 +353,7 @@ int asm_operator (FILE *output, table_t *gl_table, node_t *node)
                 log(1, "END Asm IF");
         }
 
+        table_dtor(&loc_table);
         return 0;
 }
 
@@ -397,13 +369,13 @@ int func_init (FILE *output, node_t *node, table_t *table)
                         return INIT_ERROR;
                 }
         }
-
         if (resize_table(table))
                 return REALLOC_ERR;
 
         table->funcs[table->func_size].type = node->sub_type;
         strcpy(table->funcs[table->func_size].name, node->name);
         table->func_size++;
+
         log(2, "Added to func_table \"%s\" function", table->funcs[table->func_size - 1].name);
 
         asm_func(output, node, table);
@@ -419,24 +391,26 @@ int asm_func (FILE *output, node_t *node, table_t *table)
         resize_table(table);
 
         table_t loc_table = {};
-        table_ctor(&loc_table, DEFAULT_N_VARS, DEFAULT_N_FUNCS);
-        loc_table.var_size = count_args(node, &loc_table);
+        table_ctor(&loc_table, DEFAULT_N_VARS, 0);
+        loc_table.var_size = count_args(node->left, &loc_table);
 
-        fprintf(output, "jmp skip%lld \n", table->func_size);
+        fprintf(output, "\njmp skip%lld \n", table->func_size);
         fprintf(output, "%s:\n", node->name);
 
         asm_node(node->left, table, output);
 
         for (size_t i = loc_table.var_size - 1; i > 0; i--) {
                 fprintf(output, "pop [rbx + %lld]\n", i);
+                log(2, "Add argument with \"%s\" name", loc_table.vars[i].name);
         }
 
         asm_node(node->right, table, output);
 
         fprintf(output, "ret\n");
-        fprintf(output, "skip%lld:\n", table->func_size);
+        fprintf(output, "skip%lld:\n\n", table->func_size);
 
         log(2, "Assmed \"%s\" function", node->name);
+        table_dtor(&loc_table);
         return 0;
 }
 
@@ -452,10 +426,88 @@ size_t count_args(node_t *node, table_t *table)
         if (node->right)
                 count += count_args(node->right, table);
 
-        if (node->type == VARIABLE)
+        if (node->type == VARIABLE) {
                 count++;
+        $s(node->name)
+        }
 
         return count;
 }
 
 #undef push
+#undef asm_node
+
+int table_ctor (table_t *table, size_t var_cap, size_t func_cap)
+{
+        assert_ptr(table);
+
+        table->vars = (variable_t*) calloc(var_cap, sizeof(variable_t));
+        if (!table->vars) {
+                log(1, "Calloc for variable table if NULL");
+                return NULL_CALLOC;
+        }
+        table->var_cap = var_cap;
+
+
+        table->funcs = (function_t*) calloc(func_cap, sizeof(function_t));
+        if (!table->funcs) {
+                log(1, "Calloc for function table if NULL");
+                return NULL_CALLOC;
+        }
+        table->func_cap = func_cap;
+
+        return 0;
+}
+
+int resize_table (table_t *table)
+{
+        assert_ptr(table);
+
+        variable_t *temp = nullptr;
+        if (table->var_size + 10 >= table->var_cap) {
+                temp = (variable_t*) realloc(table->vars, sizeof(variable_t) * table->var_cap * 2);
+                if (temp) {
+                        table->vars = temp;
+                } else {
+                        log(1, "<span style = \"color: red; font-size:16px;\">!Realloc returned null!</span>");
+                        return REALLOC_ERR;
+                }
+                log(1, "<span style = \"color: green; font-size:10px;\">Resized var_table</span>");
+        }
+
+        function_t *temp2 = nullptr;
+        if (table->func_size + 10 >= table->func_cap) {
+                temp2 = (function_t*) realloc(table->funcs, sizeof(function_t) * table->func_cap * 2);
+                if (temp2 || table->func_cap == 0) {
+                        table->funcs = temp2;
+                } else {
+                        log(1, "<span style = \"color: red; font-size:16px;\">!Realloc returned null!</span>");
+                        return REALLOC_ERR;
+                }
+                log(1, "<span style = \"color: green; font-size:10px;\">Resized func_table</span>");
+        }
+
+        return 0;
+}
+
+int table_dtor (table_t *table)
+{
+        assert_ptr(table);
+
+        if (table->vars) {
+                free(table->vars);
+                table->vars = nullptr;
+                log(1, "<span style = \"color: green; font-size:14px;\"> Freed variable table </span>");
+        } else {
+                log(1, "<span style = \"color: #436AE8; font-size:14px;\"> Destructor of table tried to free variables pointer </span>");
+        }
+        if (table->funcs) {
+                free(table->funcs);
+                table->funcs = nullptr;
+                log(1, "<span style = \"color: green; font-size:14px;\"> Freed function table </span>");
+        } else {
+                log(1, "<span style = \"color: #436AE8; font-size:14px;\"> Destructor of table tried to free functions pointer </span>");
+        }
+
+        return 0;
+}

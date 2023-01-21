@@ -31,25 +31,25 @@ struct table_t {
         size_t or_size       = 0;
         size_t while_size    = 0;
 
-        function_t *funcs     = nullptr;
+        function_t *funcs    = nullptr;
         size_t func_cap      = 0;
         size_t func_size     = 0;
 };
 
-int create_asm (tree_t *tree, const char *file_name);
-int asm_node (node_t *node, table_t *gl_table, FILE *output);
-int var_init (table_t *table, int sub_type, char *name);
-int resize_table (table_t *table);
-int table_ctor (table_t *table, size_t var_cap, size_t func_cap);
-int table_dtor (table_t *table);
-size_t find_var (table_t *table, char *name);
-int asm_while (FILE *output, table_t *gl_table, node_t *node);
-int asm_and (FILE *output, table_t *gl_table, node_t *node);
-int asm_or (FILE *output, table_t *gl_table, node_t *node);
-int asm_operator (FILE *output, table_t *gl_table, node_t *node);
-int func_init (FILE *output, node_t *node, table_t *table);
-int asm_func (FILE *output, node_t *node, table_t *table);
-size_t count_args(node_t *node, table_t *table);
+int create_asm    (tree_t *tree, const char *file_name);
+int base_asm_node      (node_t *node, table_t *gl_table, table_t *loc_table, FILE *output);
+int var_init      (table_t *gl_table, table_t *loc_table, int sub_type, char *name);
+int resize_table  (table_t *table);
+int table_ctor    (table_t *table, size_t var_cap, size_t func_cap);
+int table_dtor    (table_t *table);
+size_t find_var   (table_t *table, char *name);
+int asm_while     (FILE *output, table_t *gl_table, node_t *node);
+int asm_and       (FILE *output, table_t *gl_table, node_t *node);
+int asm_or        (FILE *output, table_t *gl_table, node_t *node);
+int asm_operator  (FILE *output, table_t *gl_table, node_t *node);
+int func_init     (FILE *output, node_t *node, table_t *table);
+int asm_func      (FILE *output, node_t *node, table_t *table);
+size_t count_args (node_t *node, table_t *table);
 
 
 #endif /*BACKEND_H*/
