@@ -67,7 +67,7 @@ static const char edge_atr_sample[] = "\nedge[penwidth = %d, color = \"%s\"];";
 static const char node_sample_str[]  = "node%p [label = \"%s\"];\n";
 static const char node_sample_dbl[]  = "node%p [label = \"%lg\"];\n";
 static const char node_sample_c[]    = "node%p [label = \"%c\"];\n";
-static const char node_sample_dec[]  = "node%p [label = \"%d\"];\n";
+static const char node_sample_dec[]  = "node%p [shape = record label = \"{ %d | sub_type: %d}\"];\n";
 
 static const char nodes_tie_atr[] = "node%p -> node%p [color = %s];\n";
 
@@ -128,7 +128,7 @@ void print_gv_nodes (node_t *node)
                 gv_print(node_sample_ass, node, node->name, "assign");
                 log(2, "Graph assignment: %s", node->name);
         } else if (node->type == NUMBER) {
-                gv_print(node_sample_dec, node, node->data);
+                gv_print(node_sample_dec, node, node->data, node->sub_type);
                 log(2, "Graph number: %d", node->data);
         } else if (node->type == NAME) {
                 gv_print(node_sample_ass, node, node->name, "name");

@@ -217,17 +217,16 @@ int convert_code (code_t *code, FILE *output_code, int second_cycle, labels_t *l
                         return NO_LABEL;
         }
         $
-        // fclose(output_code);
         $
-        FILE* output_code2 = fopen("output2.txt", "w");
+        // FILE* output_code2 = fopen("output3.txt", "w");
 
         $
         for (int i = 0; i <= ip; i++) {
                 // printf("%d ", asm_code[i]);
                 $
-                printf("%d %d %p\n", i, asm_code[i], output_code2);
+                printf("%d %d %p\n", i, asm_code[i], output_code);
                 $
-                fprintf(output_code2, "%d ", asm_code[i]);
+                fprintf(output_code, "%d ", asm_code[i]);
                 $
                 // if (asm_code[i] == CMD_HLT)
                         // fprintf(output_code, "\n");

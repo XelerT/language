@@ -140,10 +140,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
                 #include "..\include\symbles.sym"
                 default:
                         log(1, "here");
-                        $
                         if (!get_relat_op(token, buf, ip)) {
-                                $
-                                $c(buf[*ip])
                                 if (buf[*ip] == '=') {
                                         $
                                         token->type = ASSIGNMENT;
@@ -210,7 +207,7 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(token);
         assert_ptr(buf);
         assert_ptr(ip);
-        $
+
         switch (buf[*ip]) {
         case '=':
         case '!':
@@ -221,11 +218,13 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
                         token->name[1] = buf[*ip];
                         token->type = RELATIVE_OP;
                         return '=';
+                } else if (buf[*ip] != '=') {
+                        token->name[0] = buf[(*ip)++];
+                        token->type = RELATIVE_OP;
+                        return '<';
                 }
                 break;
         default:
-                $
-                $c(buf[*ip])
                 return 0;
         }
         $

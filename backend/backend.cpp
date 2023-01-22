@@ -53,6 +53,7 @@ int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *ou
                 if (node->type != ASSIGNMENT || node->left->type != NAME)
                         asm_node(node->left, gl_table, output);
         }
+        $
         if (node->right && node->type != OPERATOR                    &&
             node->type != AND  && node->type != OR                   &&
             node->type != CYCLE && node->type != RELATIVE_OP         &&
@@ -62,10 +63,14 @@ int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *ou
 
                 asm_node(node->right, gl_table, output);
         }
-
+        $
         size_t indent  = 0;
         size_t indent2 = 0;
         int is_casted  = 0;
+        int first_in_loc_table = 0;
+        int sec_in_loc_table = 0;
+        char first_var_type = 0;
+        char second_var_type = 0;
 
         switch (node->type) {
         case FUNC:
@@ -137,32 +142,39 @@ int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *ou
                 $
                 if (indent == SIZE_T_ERROR && loc_table) {
                         indent = find_var(loc_table, node->left->name);
+                        first_in_loc_table = 1;
                 }
                 if (indent2 == SIZE_T_ERROR && loc_table) {
                         indent2 = find_var(loc_table, node->left->name);
+                        sec_in_loc_table = 1;
                 }
                 if (indent == SIZE_T_ERROR) {
                         log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s was not initialized!</span>", node->left->name);
                         return INIT_ERROR;
                 }
-                $
-                // if (node->left->type == NAME && node->type == ASSIGNMENT)
-                //         fprintf(output, "push [%s + %lld]\npop\n", indent != SIZE_T_ERROR ? "rax": "rbx", indent);
 
-                if (switch_table(vars[indent].type) == INT && ((node->right->sub_type == FLOAT || node->right->casted) ||
-                                                                (indent2 != SIZE_T_ERROR && (switch_table(vars[indent2].type) == FLOAT              ||
-                                                                gl_table->vars[indent2].type == FLOAT)))) {
-                        $
+                if (loc_table && first_in_loc_table) {
+                        first_var_type = loc_table->vars[indent].type;
+                } else {
+                        first_var_type = gl_table->vars[indent].type;
+                }
+
+                if (loc_table && sec_in_loc_table) {
+                        second_var_type = loc_table->vars[indent2].type;
+                } else {
+                        second_var_type = gl_table->vars[indent2].type;
+                }
+
+                if (first_var_type == INT && (node->right->sub_type == FLOAT || node->right->casted ||
+                                                                (indent2 != SIZE_T_ERROR && second_var_type == FLOAT))) {
                         fprintf(output, "push 100\n");
                         fprintf(output, "div\n");
-                } else if (switch_table(vars[indent].type) == FLOAT && ((node->right->sub_type == INT && !node->right->casted) ||
-                                                                        (indent2 != SIZE_T_ERROR && (switch_table(vars[indent2].type) == INT              ||
-                                                                        gl_table->vars[indent2].type == INT)))) {
-                        $
+                } else if (first_var_type == FLOAT && ((node->right->sub_type == INT && !node->right->casted) ||
+                                                                        (indent2 != SIZE_T_ERROR && (second_var_type == INT)))) {
                         fprintf(output, "push 100\n");
                         fprintf(output, "mul\n");
                 }
-$
+
                 if (switch_table(vars[indent].type) == INT || gl_table->vars[indent].type == INT)
                         fprintf(output, "pop [%s + %lld]\n", loc_table ? "rbx": "rax", indent);
                 else if (switch_table(vars[indent].type) == FLOAT || gl_table->vars[indent].type == INT)
@@ -180,7 +192,7 @@ $
                 log(2, "Pushed %d", node->data);
                 break;
         case ADD_OPERATOR:
-                is_casted = cast_type(node, gl_table, nullptr);
+                is_casted = cast_type(node, gl_table, loc_table ? loc_table: nullptr);
                 if (is_casted < 0)
                         node->left->casted = is_casted;
                 else if (is_casted > 0)
@@ -194,7 +206,7 @@ $
                 log(1, "add");
                 break;
         case SUB_OPERATOR:
-                is_casted = cast_type(node, gl_table, nullptr);
+                is_casted = cast_type(node, gl_table, loc_table ? loc_table: nullptr);
                 if (is_casted < 0)
                         node->left->casted = is_casted;
                 else if (is_casted > 0)
@@ -208,7 +220,7 @@ $
                 log(1, "sub");
                 break;
         case MUL_OPERATOR:
-                is_casted = cast_type(node, gl_table, nullptr);
+                is_casted = cast_type(node, gl_table, loc_table ? loc_table: nullptr);
                 if (is_casted < 0)
                         node->left->casted = is_casted;
                 else if (is_casted > 0)
@@ -222,7 +234,7 @@ $
                 log(1, "mul");
                 break;
         case DIV_OPERATOR:
-                is_casted = cast_type(node, gl_table, nullptr);
+                is_casted = cast_type(node, gl_table, loc_table ? loc_table: nullptr);
                 if (is_casted < 0)
                         node->left->casted = is_casted;
                 else if (is_casted > 0)
@@ -230,7 +242,7 @@ $
 
                 asm_node(node->left, gl_table, output);
                 asm_node(node->right, gl_table, output);
-                cast_type(node, gl_table, nullptr);
+                cast_type(node, gl_table, loc_table ? loc_table: nullptr);
 
                 fprintf(output, "div\n");
 
@@ -633,40 +645,63 @@ int cast_type (node_t *node, table_t *gl_table, table_t *loc_table)
         assert_ptr(gl_table);
 
         if (node->right && node->left) {
+                int first_in_loc_table = 0;
                 size_t indent1 = find_var(gl_table, node->left->name);
-                if (!indent1 && loc_table)
+                if (indent1 == SIZE_T_ERROR && loc_table) {
                         indent1 = find_var(loc_table, node->left->name);
+                        first_in_loc_table = 1;
+                }
 
+                int second_in_loc_table = 0;
                 size_t indent2 = 0;
                 $d(node->right->type)
                 if (node->right->type != NAME && node->right->type != NUMBER) {
-
                         indent2 = find_var(gl_table, node->right->left->name);
-                        if (!indent2 && loc_table)
+                        if (indent2 == SIZE_T_ERROR && loc_table) {
                                 indent2 = find_var(loc_table, node->right->left->name);
+                                second_in_loc_table = 1;
+                        }
                 } else {
-                $
                         indent2 = find_var(gl_table, node->right->name);
                         $lld(indent2)
                         $p(loc_table)
-                        if (indent2 == SIZE_T_ERROR && loc_table)
+                        if (indent2 == SIZE_T_ERROR && loc_table) {
                                 indent2 = find_var(loc_table, node->right->name);
+                                second_in_loc_table = 1;
+                        }
                 }
-                $d(node->right->sub_type)
+
+                log(3, "Indent1: %lld, Indent2: %lld", indent1, indent2);
+
+                int first_var_type = 0;
+                int second_var_type = 0;
+                if (indent1 != SIZE_T_ERROR) {
+                        if (first_in_loc_table)
+                                first_var_type = loc_table->vars[indent1].type;
+                        else
+                                first_var_type =  gl_table->vars[indent1].type;
+                }
+                if (indent2 != SIZE_T_ERROR) {
+                        if (second_in_loc_table)
+                                second_var_type = loc_table->vars[indent2].type;
+                        else
+                                second_var_type =  gl_table->vars[indent2].type;
+                }
+
                 if (node->left->type == NAME && node->right->type == NAME) {
-                        if (switch_table(vars[indent1].type) == INT && switch_table(vars[indent2].type) == FLOAT)
+                        if (first_var_type == INT && second_var_type == FLOAT)
                                 return -1;
-                        if (switch_table(vars[indent1].type) == FLOAT && switch_table(vars[indent2].type) == INT)
+                        if (first_var_type == FLOAT && second_var_type == INT)
                                 return 1;
                 } else if (node->left->type == NAME && node->right->type == NUMBER) {
-                        if (switch_table(vars[indent1].type) == INT && node->right->sub_type == FLOAT)
+                        if (first_var_type == INT && node->right->sub_type == FLOAT)
                                 return -1;
-                        if (switch_table(vars[indent1].type) == FLOAT && node->right->sub_type == INT)
+                        if (first_var_type == FLOAT && node->right->sub_type == INT)
                                 return 1;
                 } else if (node->left->type == NUMBER && node->right->type == NAME) {
-                        if (node->left->sub_type == INT && switch_table(vars[indent2].type) == FLOAT)
+                        if (node->left->sub_type == INT && second_var_type  == FLOAT)
                                 return -1;
-                        if (node->left->sub_type == FLOAT && switch_table(vars[indent2].type) == INT)
+                        if (node->left->sub_type == FLOAT && second_var_type == INT)
                                 return 1;
                 } else if (node->left->type == NUMBER && node->right->type == NUMBER) {
                         if (node->left->sub_type == INT && node->right->sub_type == FLOAT)
@@ -674,6 +709,7 @@ int cast_type (node_t *node, table_t *gl_table, table_t *loc_table)
                         if (node->left->sub_type == FLOAT && node->right->sub_type == INT)
                                 return 1;
                 }
+                $
         }
 
         return 0;

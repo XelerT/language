@@ -33,7 +33,7 @@ int main (int argc, char *argv[])
 
         get_tokens(&tokens, input_file_name);
         arr_graph (&tokens, "output_utils\\tokens_graph.dot", "tokens.png");
-        // system("make graph_tokens");
+        system("make graph_tokens");
 
         size_t tp = 0;
         tree.root = get_g(&tokens, &tp, &tree);
@@ -42,7 +42,7 @@ int main (int argc, char *argv[])
         system("make graph_tree");
 
         create_asm (&tree, output_file_name);
-//
+
 //         char *cmd_line1[] = {
 //                 "asm.exe",
 //                 "output.txt",
