@@ -1,0 +1,35 @@
+
+#define PP_CASE(coeff)                                                                  \
+                {sscanf(code->lines[i].ptr + strlen(cmd), "%s", name);                  \
+                asm_code[ip] = get_pp_code(name, &asm_code[ip + 1], cmd, coeff);        \
+                ip += 2;}
+
+#define DEF_CMD(name_,num,arg,...)                       \
+                if (stricmp(cmd,#name_) == 0) {          \
+                        asm_code[ip++] = CMD_##name_;    \
+                } else
+
+#define DEF_STND_CMD(name_,num,arg,...)                 \
+                if (stricmp(cmd,#name_) == 0) {         \
+                        if (arg)                        \
+                                __VA_ARGS__             \
+                } else
+
+//#define CALL_ { asm_code[ip++] = CMD_CALL; if (asm_jmp_call(second_cycle, code,
+//                  asm_code, cmd, name, labels, i, &ip))
+//                                return NO_LABEL;}
+
+#define DEF_J_CMD(name_,num,arg,...)                                    \
+                if (stricmp(cmd,#name_) == 0) {                         \
+                        asm_code[ip++] = CMD_##name_;                   \
+                        if (asm_jmp_call(second_cycle, code,            \
+                                asm_code, cmd, name, labels, i, &ip))   \
+                                        return NO_LABEL;                \
+                } else
+
+#include "..\instructions.en"
+
+#undef PP_CASE
+#undef CALL_
+#undef DEF_STND_CMD
+#undef DEF_J_CMD

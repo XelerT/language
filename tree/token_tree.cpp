@@ -428,6 +428,7 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 case NUMBER:
                         node.data = arg[*tp].val;
                         node.type = NUMBER;
+                        node.sub_type = arg[*tp].sub_type;
                         node.atr.fillcolor = "#CEEFF5";
                         ++*tp;
                         break;
@@ -455,6 +456,9 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                                 log(1, "Created return");
                                 ++*tp;
                                 node.right = get_p(tokens, tp, tree);
+                        } else {
+                                node.sub_type = PRINT;
+                                ++*tp;
                         }
                         break;
                 default:

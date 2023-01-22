@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tree\tree.h"
+#include "..\tree\tree.h"
 #include "backend.h"
 
 int create_asm (tree_t *tree, const char *file_name)
@@ -11,12 +11,12 @@ int create_asm (tree_t *tree, const char *file_name)
         table_t global_table = {};
         if (table_ctor(&global_table, DEFAULT_N_VARS, DEFAULT_N_FUNCS))
                 return NULL_CALLOC;
-$
+
         FILE *output = fopen(file_name, "w");
 
         log(1, "<span style = \"color: blue; font-size:30px;\">START WRITING ASSEMLER</span>");
         base_asm_node(tree->root, &global_table, nullptr, output);
-$
+
         fprintf(output, "hlt\n");
         table_dtor(&global_table);
         fclose(output);
@@ -33,7 +33,11 @@ $
                                 break;
 
 #define asm_node(node,gl_table,output) base_asm_node(node, gl_table, loc_table, output);
-#define switch_table(arg) loc_table.vars ? loc_table.arg: gl_table->arg
+#define switch_table(arg) loc_table ? loc_table->arg: gl_table->arg
+#define CMD(name,num,asm_code) else if (node->sub_type == name)                 \
+                                        fprintf(output, "%s", asm_code);
+
+#pragma GCC diagnostic ignored "-Wlogical-op"
 
 int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *output)
 {
@@ -41,19 +45,27 @@ int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *ou
         assert_ptr(gl_table);
         assert_ptr(output);
 
-        if (node->left && node->type != AND  && node->type != OR &&
-            node->type != CYCLE && node->type != RELATIVE_OP     &&
-            node->type != FUNC_INIT && node->type != FUNC) {
-                asm_node(node->left, gl_table, output);
+        if (node->left && node->type != AND  && node->type != OR     &&
+            node->type != CYCLE && node->type != RELATIVE_OP         &&
+            node->type != FUNC_INIT && node->type != FUNC            &&
+            node->type != ADD_OPERATOR && node->type != SUB_OPERATOR &&
+            node->type != MUL_OPERATOR && node->type != DIV_OPERATOR) {
+                if (node->type != ASSIGNMENT || node->left->type != NAME)
+                        asm_node(node->left, gl_table, output);
         }
-        if (node->right && node->type != OPERATOR            &&
-            node->type != AND  && node->type != OR           &&
-            node->type != CYCLE && node->type != RELATIVE_OP &&
-            node->type != FUNC_INIT && node->type != STAFF) {
+        if (node->right && node->type != OPERATOR                    &&
+            node->type != AND  && node->type != OR                   &&
+            node->type != CYCLE && node->type != RELATIVE_OP         &&
+            node->type != FUNC_INIT && node->type != STAFF           &&
+            node->type != ADD_OPERATOR && node->type != SUB_OPERATOR &&
+            node->type != MUL_OPERATOR && node->type != DIV_OPERATOR) {
+
                 asm_node(node->right, gl_table, output);
         }
 
-        size_t indent = 0;
+        size_t indent  = 0;
+        size_t indent2 = 0;
+        int is_casted  = 0;
 
         switch (node->type) {
         case FUNC:
@@ -64,6 +76,7 @@ int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *ou
                 if (node->sub_type == RETURN) {
                         asm_node(node->right, gl_table, output);
                 }
+#include "..\include\special_cmds.cmds"
                 break;
         case FUNC_INIT:
                 func_init(output, node, gl_table);
@@ -110,15 +123,7 @@ int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *ou
                 asm_operator(output, gl_table, node);
                 break;
         case NAME:
-                log(1, "START Asm NAME");
-                indent = find_var(gl_table, node->name);
-                if (indent == SIZE_T_ERROR) {
-                        log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s was not initialized!</span>", node->name);
-                        return INIT_ERROR;
-                }
-                fprintf(output, "push [rax + %lld]\n", indent);
-
-                log(1, "END Asm NAME");
+                asm_name(output, gl_table, node);
                 break;
         case VARIABLE:
                 if (var_init(gl_table, loc_table ? loc_table: nullptr, node->sub_type, node->name)) {
@@ -127,39 +132,106 @@ int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *ou
                 log(2, "Initialized \"%s\" variable", node->name);
                 break;
         case ASSIGNMENT:
-                indent = find_var(gl_table,  node->left->name);
-                if (indent == SIZE_T_ERROR) {
+                indent  = find_var(gl_table,  node->left->name);
+                indent2 = find_var(gl_table,  node->right->name);
+                $
+                if (indent == SIZE_T_ERROR && loc_table) {
                         indent = find_var(loc_table, node->left->name);
+                }
+                if (indent2 == SIZE_T_ERROR && loc_table) {
+                        indent2 = find_var(loc_table, node->left->name);
                 }
                 if (indent == SIZE_T_ERROR) {
                         log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s was not initialized!</span>", node->left->name);
                         return INIT_ERROR;
                 }
-                fprintf(output, "pop [%s + %lld]\n", loc_table ? "rbx": "rax", indent);
+                $
+                // if (node->left->type == NAME && node->type == ASSIGNMENT)
+                //         fprintf(output, "push [%s + %lld]\npop\n", indent != SIZE_T_ERROR ? "rax": "rbx", indent);
+
+                if (switch_table(vars[indent].type) == INT && ((node->right->sub_type == FLOAT || node->right->casted) ||
+                                                                (indent2 != SIZE_T_ERROR && (switch_table(vars[indent2].type) == FLOAT              ||
+                                                                gl_table->vars[indent2].type == FLOAT)))) {
+                        $
+                        fprintf(output, "push 100\n");
+                        fprintf(output, "div\n");
+                } else if (switch_table(vars[indent].type) == FLOAT && ((node->right->sub_type == INT && !node->right->casted) ||
+                                                                        (indent2 != SIZE_T_ERROR && (switch_table(vars[indent2].type) == INT              ||
+                                                                        gl_table->vars[indent2].type == INT)))) {
+                        $
+                        fprintf(output, "push 100\n");
+                        fprintf(output, "mul\n");
+                }
+$
+                if (switch_table(vars[indent].type) == INT || gl_table->vars[indent].type == INT)
+                        fprintf(output, "pop [%s + %lld]\n", loc_table ? "rbx": "rax", indent);
+                else if (switch_table(vars[indent].type) == FLOAT || gl_table->vars[indent].type == INT)
+                        fprintf(output, "popf [%s + %lld]\n", loc_table ? "rbx": "rax", indent);
 
                 log(2, "Assigned to rax + %d", indent);
                 break;
         case NUMBER:
                 fprintf(output, "push %d\n", node->data);
+                if (node->casted) {
+                        fprintf(output, "push 100\n");
+                        fprintf(output, "mul\n");
+                }
 
                 log(2, "Pushed %d", node->data);
                 break;
         case ADD_OPERATOR:
+                is_casted = cast_type(node, gl_table, nullptr);
+                if (is_casted < 0)
+                        node->left->casted = is_casted;
+                else if (is_casted > 0)
+                        node->right->casted = is_casted;
+
+                asm_node(node->left, gl_table, output);
+                asm_node(node->right, gl_table, output);
+
                 fprintf(output, "add\n");
 
                 log(1, "add");
                 break;
         case SUB_OPERATOR:
+                is_casted = cast_type(node, gl_table, nullptr);
+                if (is_casted < 0)
+                        node->left->casted = is_casted;
+                else if (is_casted > 0)
+                        node->right->casted = is_casted;
+
+                asm_node(node->left, gl_table, output);
+                asm_node(node->right, gl_table, output);
+
                 fprintf(output, "sub\n");
 
                 log(1, "sub");
                 break;
         case MUL_OPERATOR:
+                is_casted = cast_type(node, gl_table, nullptr);
+                if (is_casted < 0)
+                        node->left->casted = is_casted;
+                else if (is_casted > 0)
+                        node->right->casted = is_casted;
+
+                asm_node(node->left, gl_table, output);
+                asm_node(node->right, gl_table, output);
+
                 fprintf(output, "mul\n");
 
                 log(1, "mul");
                 break;
         case DIV_OPERATOR:
+                is_casted = cast_type(node, gl_table, nullptr);
+                if (is_casted < 0)
+                        node->left->casted = is_casted;
+                else if (is_casted > 0)
+                        node->right->casted = is_casted;
+
+                asm_node(node->left, gl_table, output);
+                asm_node(node->right, gl_table, output);
+                cast_type(node, gl_table, nullptr);
+
                 fprintf(output, "div\n");
 
                 log(1, "div");
@@ -171,8 +243,12 @@ int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *ou
         return 0;
 }
 
+#undef CMD
 #undef rel_op
 #undef asm_node
+#undef switch_table
+
+#define switch_table(arg) loc_table.vars ? loc_table.arg: gl_table->arg
 #define asm_node(node,gl_table,output) base_asm_node(node, gl_table, loc_table.vars ? &loc_table: nullptr, output);
 
 size_t find_var (table_t *table, char *name)
@@ -211,12 +287,14 @@ int var_init (table_t *gl_table, table_t *loc_table, int sub_type, char *name)
                 if (resize_table(loc_table)) {
                         return REALLOC_ERR;
                 }
-                loc_table->vars[loc_table->var_size].val = 0;
+                loc_table->vars[loc_table->var_size].val  = 0;
+                loc_table->vars[loc_table->var_size].type = (char) sub_type;                ////////////////////////////////////TODO
                 strcpy(loc_table->vars[loc_table->var_size].name, name);
                 loc_table->var_size++;
                 log(2, "Added to local var_table \"%s\" variable", loc_table->vars[loc_table->var_size - 1].name);
         } else {
-                gl_table->vars[gl_table->var_size].val = 0;
+                gl_table->vars[gl_table->var_size].val  = 0;
+                gl_table->vars[gl_table->var_size].type = (char) sub_type;
                 strcpy(gl_table->vars[gl_table->var_size].name, name);
                 gl_table->var_size++;
                 log(2, "Added to global var_table \"%s\" variable", gl_table->vars[gl_table->var_size - 1].name);
@@ -400,7 +478,11 @@ int asm_func (FILE *output, node_t *node, table_t *table)
         asm_node(node->left, table, output);
 
         for (size_t i = loc_table.var_size - 1; i > 0; i--) {
-                fprintf(output, "pop [rbx + %lld]\n", i);
+                if (loc_table.vars[i].type == INT)
+                        fprintf(output, "pop [rbx + %lld]\n", i);
+                else if (loc_table.vars[i].type == FLOAT)
+                        fprintf(output, "popf [rbx + %lld]\n", i);
+
                 log(2, "Add argument with \"%s\" name", loc_table.vars[i].name);
         }
 
@@ -411,6 +493,35 @@ int asm_func (FILE *output, node_t *node, table_t *table)
 
         log(2, "Assmed \"%s\" function", node->name);
         table_dtor(&loc_table);
+        return 0;
+}
+
+int asm_name (FILE *output, table_t *gl_table, node_t *node)
+{
+        assert_ptr(output);
+        assert_ptr(gl_table);
+        assert_ptr(node);
+
+        log(1, "START Asm NAME");
+        size_t indent = find_var(gl_table, node->name);
+        if (indent == SIZE_T_ERROR) {
+                log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s was not initialized!</span>", node->name);
+                return INIT_ERROR;
+        }
+
+        if (gl_table->vars[indent].type == INT) {
+                if (node->casted) {
+                        fprintf(output, "push 100\n");
+                        fprintf(output, "pushf [rax + %lld]\n", indent);
+                        fprintf(output, "mul\n");
+                } else {
+                        fprintf(output, "push [rax + %lld]\n", indent);
+                }
+        } else if (gl_table->vars[indent].type == FLOAT) {
+                fprintf(output, "push [rax + %lld]\n", indent);
+        }
+
+        log(1, "END Asm NAME");
         return 0;
 }
 
@@ -511,3 +622,61 @@ int table_dtor (table_t *table)
 
         return 0;
 }
+
+#undef switch_table
+
+#define switch_table(arg) loc_table ? loc_table->arg: gl_table->arg
+
+int cast_type (node_t *node, table_t *gl_table, table_t *loc_table)
+{
+        assert_ptr(node);
+        assert_ptr(gl_table);
+
+        if (node->right && node->left) {
+                size_t indent1 = find_var(gl_table, node->left->name);
+                if (!indent1 && loc_table)
+                        indent1 = find_var(loc_table, node->left->name);
+
+                size_t indent2 = 0;
+                $d(node->right->type)
+                if (node->right->type != NAME && node->right->type != NUMBER) {
+
+                        indent2 = find_var(gl_table, node->right->left->name);
+                        if (!indent2 && loc_table)
+                                indent2 = find_var(loc_table, node->right->left->name);
+                } else {
+                $
+                        indent2 = find_var(gl_table, node->right->name);
+                        $lld(indent2)
+                        $p(loc_table)
+                        if (indent2 == SIZE_T_ERROR && loc_table)
+                                indent2 = find_var(loc_table, node->right->name);
+                }
+                $d(node->right->sub_type)
+                if (node->left->type == NAME && node->right->type == NAME) {
+                        if (switch_table(vars[indent1].type) == INT && switch_table(vars[indent2].type) == FLOAT)
+                                return -1;
+                        if (switch_table(vars[indent1].type) == FLOAT && switch_table(vars[indent2].type) == INT)
+                                return 1;
+                } else if (node->left->type == NAME && node->right->type == NUMBER) {
+                        if (switch_table(vars[indent1].type) == INT && node->right->sub_type == FLOAT)
+                                return -1;
+                        if (switch_table(vars[indent1].type) == FLOAT && node->right->sub_type == INT)
+                                return 1;
+                } else if (node->left->type == NUMBER && node->right->type == NAME) {
+                        if (node->left->sub_type == INT && switch_table(vars[indent2].type) == FLOAT)
+                                return -1;
+                        if (node->left->sub_type == FLOAT && switch_table(vars[indent2].type) == INT)
+                                return 1;
+                } else if (node->left->type == NUMBER && node->right->type == NUMBER) {
+                        if (node->left->sub_type == INT && node->right->sub_type == FLOAT)
+                                return -1;
+                        if (node->left->sub_type == FLOAT && node->right->sub_type == INT)
+                                return 1;
+                }
+        }
+
+        return 0;
+}
+
+#undef switch_tables

@@ -4,9 +4,9 @@
 #include <ctype.h>
 #include <math.h>
 #include <locale.h>
-#include "include\lexer.h"
-#include "log\log.h"
-#include "include\graph_tokens.h"
+#include "..\include\lexer.h"
+#include "..\log\log.h"
+#include "..\include\graph_tokens.h"
 
 tokens_t* tokens_ctor (tokens_t *tokens, size_t capacity)
 {
@@ -128,7 +128,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
 
         if (isalpha(buf[*ip])) {
                 get_word(token, buf, ip);
-                #include "include\key_words.kw"
+                #include "..\include\key_words.kw"
                 /*else*/
                         token->type = NAME;
                 log(3, "Got token with name: \"%s\" and type: \"%d\"", token->name, token->sub_type);
@@ -137,7 +137,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
                 log(2, "DIGIT-TOKEN has type %d", token->type);
         } else {
                 switch (buf[*ip]) {
-                #include "include\symbles.sym"
+                #include "..\include\symbles.sym"
                 default:
                         log(1, "here");
                         $
@@ -170,7 +170,17 @@ int get_number(token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(ip);
 
         elem_t val = 0;
-        for (int i = 0; isdigit(buf[*ip]); i++) {
+        char float_counter = -1;
+        token->sub_type = INT;
+
+        for (int i = 0; (isdigit(buf[*ip]) || buf[*ip] == '.') && float_counter != 2; i++) {
+                if (buf[*ip] == '.') {
+                        token->sub_type = FLOAT;
+                        ++*ip;
+                        float_counter++;
+                } else if (float_counter >= 0) {
+                        float_counter++;
+                }
                 val = val * 10 + (buf[*ip] - '0');
                 ++*ip;
         }
@@ -237,7 +247,7 @@ int get_punct (token_arg_t *token, char *buf, size_t *ip)
         assert_ptr(ip);
 
         switch (buf[*ip]) {
-#include "include\symbles.sym"
+#include "..\include\symbles.sym"
         default:
                 return 0;
         }

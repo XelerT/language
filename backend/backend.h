@@ -1,7 +1,7 @@
 #ifndef BACKEND_H
 #define BACHEND_H
 
-#include "include\utils.h"
+#include "..\include\utils.h"
 
 const size_t SIZE_T_ERROR = 9999999999;
 
@@ -13,6 +13,7 @@ struct variable_t {
         char name[MAX_NAME_LENGTH] = {'\0'};
         elem_t val = 0;
         int number = 0;
+        char type  = 0;
 };
 
 struct function_t {
@@ -37,7 +38,7 @@ struct table_t {
 };
 
 int create_asm    (tree_t *tree, const char *file_name);
-int base_asm_node      (node_t *node, table_t *gl_table, table_t *loc_table, FILE *output);
+int base_asm_node (node_t *node, table_t *gl_table, table_t *loc_table, FILE *output);
 int var_init      (table_t *gl_table, table_t *loc_table, int sub_type, char *name);
 int resize_table  (table_t *table);
 int table_ctor    (table_t *table, size_t var_cap, size_t func_cap);
@@ -48,8 +49,9 @@ int asm_and       (FILE *output, table_t *gl_table, node_t *node);
 int asm_or        (FILE *output, table_t *gl_table, node_t *node);
 int asm_operator  (FILE *output, table_t *gl_table, node_t *node);
 int func_init     (FILE *output, node_t *node, table_t *table);
+int asm_name      (FILE *output, table_t *gl_table, node_t *node);
 int asm_func      (FILE *output, node_t *node, table_t *table);
 size_t count_args (node_t *node, table_t *table);
-
+int cast_type (node_t *node, table_t *gl_table, table_t *loc_table);
 
 #endif /*BACKEND_H*/

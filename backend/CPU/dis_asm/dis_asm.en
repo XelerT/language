@@ -1,0 +1,13 @@
+
+#define DEF_STND_CMD(name,num,arg,...)                 \
+                case num:                              \
+                        if (arg) __VA_ARGS__           \
+                        ip++;                          \
+                        break;
+
+#include "..\instructions.en"
+
+#undef PP_CASE
+#undef CALL_
+#undef JMP_
+#undef DEF_STDN_CMD

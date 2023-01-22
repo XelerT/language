@@ -19,7 +19,7 @@ enum tree_errors {
 };
 
 enum errors {
-        NULL_CALLOC = -1,
+        NULL_CALLOC   = -1,
         NULL_FILE_PTR = -2
 };
 
@@ -32,6 +32,7 @@ struct node_t {
         unsigned int  type         =       0;
         char sub_type              =       0;
         char name[MAX_NAME_LENGTH] =      {};
+        int  casted                =       0;
 
         graph_node_atr_t atr = {};
 };

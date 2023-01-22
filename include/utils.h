@@ -31,4 +31,7 @@ enum main_errors {
         REALLOC_ERR = 0xBADA110C
 };
 
+int main_asm (int argc, char *argv[]);
+int main_cpu (int argc, char *argv[]);
+
 #endif /*UTILS_H*/

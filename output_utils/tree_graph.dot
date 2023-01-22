@@ -1,0 +1,112 @@
+digraph G {                                                                                  
+graph [dpi = 300];                                                                     
+splines = ortho;                                                                         
+
+node0000018AA63CF500[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#93F558",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CF500 [shape = record label = "{a | {FLOAT | 0}}"];
+
+node0000018AA63CF5A0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CF5A0 [label = "10"];
+
+node0000018AA63CF640[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CED8DB",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CF640 [shape = record label = "{= | assign}"];
+
+node0000018AA63CF6E0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#93F558",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CF6E0 [shape = record label = "{k | {INT | 0}}"];
+
+node0000018AA63CF780[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CF780 [label = "0"];
+
+node0000018AA63CF820[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CED8DB",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CF820 [shape = record label = "{= | assign}"];
+
+node0000018AA63CF8C0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CF8C0 [shape = record label = "{k | name}"];
+
+node0000018AA63CF960[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CF960 [label = "10"];
+
+node0000018AA63CFA00[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CED8DB",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CFA00 [shape = record label = "{= | assign}"];
+
+node0000018AA63CFAA0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CFAA0 [label = ";"];
+
+node0000018AA63CFB40[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CFB40 [label = ";"];
+
+node0000018AA63CFBE0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node0000018AA63CFBE0 [label = ";"];
+node0000018AA63CF640 -> node0000018AA63CF500 [color = black];
+node0000018AA63CF640 -> node0000018AA63CF5A0 [color = red];
+node0000018AA63CF820 -> node0000018AA63CF6E0 [color = black];
+node0000018AA63CF820 -> node0000018AA63CF780 [color = red];
+node0000018AA63CFA00 -> node0000018AA63CF8C0 [color = black];
+node0000018AA63CFA00 -> node0000018AA63CF960 [color = red];
+node0000018AA63CFAA0 -> node0000018AA63CFA00 [color = black];
+node0000018AA63CFB40 -> node0000018AA63CF820 [color = black];
+node0000018AA63CFB40 -> node0000018AA63CFAA0 [color = red];
+node0000018AA63CFBE0 -> node0000018AA63CF640 [color = black];
+node0000018AA63CFBE0 -> node0000018AA63CFB40 [color = red];
+
+}

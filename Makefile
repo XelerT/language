@@ -1,8 +1,17 @@
 CFILES = main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp \
-	 lexer.cpp graph_tokens.cpp tree\token_tree.cpp backend.cpp
-OUTPUT = a.exe
+	 frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp backend\backend.cpp
+
+ASM_CFILES = backend\CPU\buffer.cpp backend\CPU\asm\main.cpp backend\CPU\asm\assembler.cpp
+ASM_OUTPUT = asm.exe
+CPU_CFILES = backend\CPU\cpu\stack\stack.cpp backend\CPU\cpu\stack\security.cpp backend\CPU\cpu\main.cpp backend\CPU\cpu\cpu.cpp
+CPU_OUTPUT = cpu.exe
+DIS_ASM_CFILES = backend\CPU\buffer.cpp backend\CPU\dis_asm\main.cpp backend\CPU\dis_asm\dis_asm.cpp
+DIS_ASM_OUTPUT = dis_asm.exe
+
+OUTPUT = lang.exe
 IMG_FORMAT = png
-DOT_FILE_NAME = tokens_graph.dot
+DOT_FILE_NAME = output_utils\tokens_graph.dot
+UTILS_DIRECTORY = output_utils
 
 CFLAGS= -Wshadow    			\
 	-Winit-self 			\
@@ -46,12 +55,14 @@ CFLAGS= -Wshadow    			\
 
 all:
 	@ cls
-	@ g++ -o $(OUTPUT) $(CFLAGS) $(CFILES)
-def:
-	@g++ -E $(OUTPUT) $(CFLAGS) $(CFILES) >> defines.txt
+	@ g++ -o $(OUTPUT) $(CFLAGS) $(CFILES) $(ASM_CFILES) $(CPU_CFILES)
 
+def:
+	@ g++ -E $(OUTPUT) $(CFLAGS) $(CFILES) >> defines.txt
+
+.PHONY: run
 run:
-	@ a.exe
+	@ $(OUTPUT) asm_code.txt input.txt
 	@ echo Run
 
 .PHONY: clean
@@ -70,12 +81,16 @@ graphviz:
 
 .PHONY: original_graphviz
 original_graphviz:
-	@ dot -T $(IMG_FORMAT) -o tree_graph.$(IMG_FORMAT) tree_graph.dot
+	@ dot -T $(IMG_FORMAT) -o tree_graph.$(IMG_FORMAT) output_utils\tree_graph.dot
 
 .PHONY: graph_tokens
 graph_tokens:
-	@ dot -T $(IMG_FORMAT) -o tokens.png tokens_graph.dot
+	@ dot -T $(IMG_FORMAT) -o output_utils\tokens.png output_utils\tokens_graph.dot
 
 .PHONY: graph_tree
 graph_tree:
-	@ dot -T $(IMG_FORMAT) -o tree.png tree_graph.dot
+	@ dot -T $(IMG_FORMAT) -o output_utils\tree.png output_utils\tree_graph.dot
+
+.PHONY: run_cpu
+run_cpu:
+
