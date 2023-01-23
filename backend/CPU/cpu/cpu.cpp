@@ -39,7 +39,7 @@
 #define PUSH(arg) stack_push(stk, arg)
 #define POP stack_pop(stk)
 
-#define JMP ip = code->cmds[ip + 1];
+#define JMP {ip = code->cmds[ip + 1];}
 
 int execute_code (code_t *code, stack *stk, cpu_t *cpu)
 {
@@ -55,7 +55,7 @@ int execute_code (code_t *code, stack *stk, cpu_t *cpu)
                 return CTOR_ERROR;
 
         while (code->cmds[ip] != CMD_HLT) {
-                // printf("NOT HLT1 %d\n", ip);
+                // printf("%d cmd: %d\n", ip, code->cmds[ip]);
                 switch (code->cmds[ip] & MASK_CMD) {
 #include "..\instructions.en"
                 case CMD_CALL_LABEL:
@@ -66,12 +66,8 @@ int execute_code (code_t *code, stack *stk, cpu_t *cpu)
                 default:
                         ip++;
                 }
-                // for (int i = 0; i < 20; i++) {
-                //         printf("%d %d", i, cpu->registers[1]);
-                //         $d(cpu->RAM[i]);
-                // }
         }
-// printf("HLT %d\n", ip);
+
         return 0;
 }
 

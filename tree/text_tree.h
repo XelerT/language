@@ -32,7 +32,6 @@ void get_tree (tree_t *tree, node_t *node, text_t *text, size_t *line_count);
 char* get_line(char *line);
 char *skip_tabs (char *line);
 int tree2text (node_t *node, FILE *output, int n_tabs);
-void print_tabs (FILE *output, int n_tabs);
 // int edit_temp (node_t *temp_node, char node_type, double node_data);
 
 // node_t* get_g (const char *str, size_t *char_count, tree_t *tree);

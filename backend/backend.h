@@ -35,6 +35,8 @@ struct table_t {
         function_t *funcs    = nullptr;
         size_t func_cap      = 0;
         size_t func_size     = 0;
+
+        size_t rel_op_size   = 0;
 };
 
 struct tab_table_t {

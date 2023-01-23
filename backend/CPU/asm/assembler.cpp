@@ -174,7 +174,7 @@ int convert_code (code_t *code, FILE *output_code, int second_cycle, labels_t *l
 
         for (size_t i = 0; i < code->n_lines; i++) {
                 sscanf(code->lines[i].ptr, "%s", cmd);
-                printf("%s\n", code->lines[i].ptr);
+
 #include "asm_instructions.en"
 
                 /*else*/ if (strrchr(cmd, ':')) {
@@ -193,6 +193,7 @@ int convert_code (code_t *code, FILE *output_code, int second_cycle, labels_t *l
         for (int i = 0; i <= ip + 1; i++) {
                 fprintf(output_code, "%d ", asm_code[i]);
         }
+        // listing (code, asm_code, "saxcxc", 196);
 
         return 0;
 }
@@ -212,7 +213,6 @@ int asm_jmp_call (int second_cycle, code_t *code, int *asm_code,
                 sscanf(code->lines[i].ptr + strlen(cmd), "%s", name);
                 if ((asm_code[(*ip)++] = get_jmp_line(labels, name)) == NO_LABEL)
                         return NO_LABEL;
-                // printf("asm line %d\n", asm_code[*ip - 1]);
         } else {
                 char label_name[MAX_NAME_LENGTH] = {0};
                 sscanf(code->lines[i].ptr + strlen(cmd), "%s", label_name);
@@ -255,6 +255,9 @@ int get_pp_code (const char *val, int *asm_code, const char *cmd, int coeff)
                                 num |= ARG_IMMED;
                         } else if (sscanf(val, "%d", asm_code))
                                 num = ARG_IMMED;
+                } else if ((stricmp(cmd, "pop") == 0) || (stricmp(cmd, "pop") == 0)) {
+                        *asm_code = 0;
+                        num |= ARG_IMMED;
                 }
         }
 
@@ -300,6 +303,8 @@ void listing (code_t *code, int *asm_code, char *function, int line)
                                 ip++;
                                 break;
                         case CMD_JMP:
+                        case CMD_JA:
+                        case CMD_JE:
                                 printf("%s\t | %d %d\n", code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
                                 ip++;
                                 break;

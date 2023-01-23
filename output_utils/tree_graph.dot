@@ -2,111 +2,399 @@ digraph G {
 graph [dpi = 300];                                                                     
 splines = ortho;                                                                         
 
-node0000018AA63CF500[shape = "rectangle", style = "rounded, filled",                                            		                                
+node000001F6D24FEF90[shape = "rectangle", style = "rounded, filled",                                            		                                
 height = 3, width = 2, fixedsize = false,                               		                                
 fillcolor = "#93F558",                                                    		                                
 fontsize = 30,                                                         		                                
 penwidth = 5                                                          		                                
 ];
-node0000018AA63CF500 [shape = record label = "{a | {FLOAT | 0}}"];
+node000001F6D24FEF90 [shape = record label = "{i | {INT | 0}}"];
 
-node0000018AA63CF5A0[shape = "rectangle", style = "rounded, filled",                                            		                                
-height = 3, width = 2, fixedsize = false,                               		                                
-fillcolor = "#CEEFF5",                                                    		                                
-fontsize = 30,                                                         		                                
-penwidth = 5                                                          		                                
-];
-node0000018AA63CF5A0 [label = "10"];
-
-node0000018AA63CF640[shape = "rectangle", style = "rounded, filled",                                            		                                
-height = 3, width = 2, fixedsize = false,                               		                                
-fillcolor = "#CED8DB",                                                    		                                
-fontsize = 30,                                                         		                                
-penwidth = 5                                                          		                                
-];
-node0000018AA63CF640 [shape = record label = "{= | assign}"];
-
-node0000018AA63CF6E0[shape = "rectangle", style = "rounded, filled",                                            		                                
-height = 3, width = 2, fixedsize = false,                               		                                
-fillcolor = "#93F558",                                                    		                                
-fontsize = 30,                                                         		                                
-penwidth = 5                                                          		                                
-];
-node0000018AA63CF6E0 [shape = record label = "{k | {INT | 0}}"];
-
-node0000018AA63CF780[shape = "rectangle", style = "rounded, filled",                                            		                                
-height = 3, width = 2, fixedsize = false,                               		                                
-fillcolor = "#CEEFF5",                                                    		                                
-fontsize = 30,                                                         		                                
-penwidth = 5                                                          		                                
-];
-node0000018AA63CF780 [label = "0"];
-
-node0000018AA63CF820[shape = "rectangle", style = "rounded, filled",                                            		                                
-height = 3, width = 2, fixedsize = false,                               		                                
-fillcolor = "#CED8DB",                                                    		                                
-fontsize = 30,                                                         		                                
-penwidth = 5                                                          		                                
-];
-node0000018AA63CF820 [shape = record label = "{= | assign}"];
-
-node0000018AA63CF8C0[shape = "rectangle", style = "rounded, filled",                                            		                                
+node000001F6D24FF040[shape = "rectangle", style = "rounded, filled",                                            		                                
 height = 3, width = 2, fixedsize = false,                               		                                
 fillcolor = "#00b899",                                                    		                                
 fontsize = 30,                                                         		                                
 penwidth = 5                                                          		                                
 ];
-node0000018AA63CF8C0 [shape = record label = "{k | name}"];
+node000001F6D24FF040 [shape = record label = "{i | name}"];
 
-node0000018AA63CF960[shape = "rectangle", style = "rounded, filled",                                            		                                
+node000001F6D24FF0F0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF0F0 [shape = record label = "{i | name}"];
+
+node000001F6D24FF1A0[shape = "rectangle", style = "rounded, filled",                                            		                                
 height = 3, width = 2, fixedsize = false,                               		                                
 fillcolor = "#CEEFF5",                                                    		                                
 fontsize = 30,                                                         		                                
 penwidth = 5                                                          		                                
 ];
-node0000018AA63CF960 [label = "10"];
+node000001F6D24FF1A0 [shape = record label = "{ 2 | sub_type: 1}"];
 
-node0000018AA63CFA00[shape = "rectangle", style = "rounded, filled",                                            		                                
+node000001F6D24FF250[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#F5B5D9",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF250 [label = "+"];
+
+node000001F6D24FF300[shape = "rectangle", style = "rounded, filled",                                            		                                
 height = 3, width = 2, fixedsize = false,                               		                                
 fillcolor = "#CED8DB",                                                    		                                
 fontsize = 30,                                                         		                                
 penwidth = 5                                                          		                                
 ];
-node0000018AA63CFA00 [shape = record label = "{= | assign}"];
+node000001F6D24FF300 [shape = record label = "{= | assign}"];
 
-node0000018AA63CFAA0[shape = "rectangle", style = "rounded, filled",                                            		                                
+node000001F6D24FF3B0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF3B0 [shape = record label = "{i | name}"];
+
+node000001F6D24FF460[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF460 [label = "return"];
+
+node000001F6D24FF5C0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF5C0 [shape = record label = "{i | name}"];
+
+node000001F6D24FF720[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF720 [shape = record label = "{ 10 | sub_type: 1}"];
+
+node000001F6D24FF670[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#98B1B5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF670 [label = "<"];
+
+node000001F6D25003D0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D25003D0 [shape = record label = "{i | name}"];
+
+node000001F6D24FFB90[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#D681C2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FFB90 [label = "func"];
+
+node000001F6D2500270[shape = "rectangle", style = "rounded, filled",                                            		                                
 height = 3, width = 2, fixedsize = false,                               		                                
 fillcolor = "#BDCCF2",                                                    		                                
 fontsize = 30,                                                         		                                
 penwidth = 5                                                          		                                
 ];
-node0000018AA63CFAA0 [label = ";"];
+node000001F6D2500270 [label = ";"];
 
-node0000018AA63CFB40[shape = "rectangle", style = "rounded, filled",                                            		                                
+node000001F6D24FF510[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#18D5F5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF510 [shape = record label = "{if | {operator | 2}}"];
+
+node000001F6D24FFDA0[shape = "rectangle", style = "rounded, filled",                                            		                                
 height = 3, width = 2, fixedsize = false,                               		                                
 fillcolor = "#BDCCF2",                                                    		                                
 fontsize = 30,                                                         		                                
 penwidth = 5                                                          		                                
 ];
-node0000018AA63CFB40 [label = ";"];
+node000001F6D24FFDA0 [label = ";"];
 
-node0000018AA63CFBE0[shape = "rectangle", style = "rounded, filled",                                            		                                
+node000001F6D24FFC40[shape = "rectangle", style = "rounded, filled",                                            		                                
 height = 3, width = 2, fixedsize = false,                               		                                
 fillcolor = "#BDCCF2",                                                    		                                
 fontsize = 30,                                                         		                                
 penwidth = 5                                                          		                                
 ];
-node0000018AA63CFBE0 [label = ";"];
-node0000018AA63CF640 -> node0000018AA63CF500 [color = black];
-node0000018AA63CF640 -> node0000018AA63CF5A0 [color = red];
-node0000018AA63CF820 -> node0000018AA63CF6E0 [color = black];
-node0000018AA63CF820 -> node0000018AA63CF780 [color = red];
-node0000018AA63CFA00 -> node0000018AA63CF8C0 [color = black];
-node0000018AA63CFA00 -> node0000018AA63CF960 [color = red];
-node0000018AA63CFAA0 -> node0000018AA63CFA00 [color = black];
-node0000018AA63CFB40 -> node0000018AA63CF820 [color = black];
-node0000018AA63CFB40 -> node0000018AA63CFAA0 [color = red];
-node0000018AA63CFBE0 -> node0000018AA63CF640 [color = black];
-node0000018AA63CFBE0 -> node0000018AA63CFB40 [color = red];
+node000001F6D24FFC40 [label = ";"];
+
+node000001F6D24FFCF0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FFCF0 [label = ";"];
+
+node000001F6D24FEEE0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#EB8CD5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FEEE0 [label = "func"];
+
+node000001F6D24FFF00[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FFF00 [shape = record label = "{ 2 | sub_type: 1}"];
+
+node000001F6D24FFE50[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#D681C2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FFE50 [label = "func"];
+
+node000001F6D24FFAE0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FFAE0 [shape = record label = "{ 3 | sub_type: 1}"];
+
+node000001F6D24FFFB0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#D681C2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FFFB0 [label = "func"];
+
+node000001F6D24FFA30[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#93F558",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FFA30 [shape = record label = "{k | {INT | 0}}"];
+
+node000001F6D25001C0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D25001C0 [shape = record label = "{ 5 | sub_type: 1}"];
+
+node000001F6D2500060[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CED8DB",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D2500060 [shape = record label = "{= | assign}"];
+
+node000001F6D2500110[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D2500110 [shape = record label = "{k | name}"];
+
+node000001F6D2500320[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D2500320 [shape = record label = "{ 0 | sub_type: 1}"];
+
+node000001F6D2500690[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#98B1B5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D2500690 [label = ">"];
+
+node000001F6D24FF820[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF820 [shape = record label = "{k | name}"];
+
+node000001F6D2500530[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D2500530 [shape = record label = "{k | name}"];
+
+node000001F6D24FF8D0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF8D0 [shape = record label = "{ 1 | sub_type: 1}"];
+
+node000001F6D24FF980[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#F5B5D9",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24FF980 [label = "-"];
+
+node000001F6D25005E0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CED8DB",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D25005E0 [shape = record label = "{= | assign}"];
+
+node000001F6D24DE560[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#CEEFF5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DE560 [shape = record label = "{ 99 | sub_type: 1}"];
+
+node000001F6D24DE090[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#00b899",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DE090 [label = "return"];
+
+node000001F6D24DDBC0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DDBC0 [label = ";"];
+
+node000001F6D24DDC70[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DDC70 [label = ";"];
+
+node000001F6D24DE2A0[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DE2A0 [label = ";"];
+
+node000001F6D2500480[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#18D5F5",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D2500480 [label = "while"];
+
+node000001F6D24DE140[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DE140 [label = ";"];
+
+node000001F6D24DE770[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DE770 [label = ";"];
+
+node000001F6D24DDB10[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DDB10 [label = ";"];
+
+node000001F6D24DF060[shape = "rectangle", style = "rounded, filled",                                            		                                
+height = 3, width = 2, fixedsize = false,                               		                                
+fillcolor = "#BDCCF2",                                                    		                                
+fontsize = 30,                                                         		                                
+penwidth = 5                                                          		                                
+];
+node000001F6D24DF060 [label = ";"];
+node000001F6D24FF250 -> node000001F6D24FF0F0 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF250 -> node000001F6D24FF1A0 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF300 -> node000001F6D24FF040 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF300 -> node000001F6D24FF250 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF670 -> node000001F6D24FF5C0 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF670 -> node000001F6D24FF720 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFB90 -> node000001F6D25003D0 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D2500270 -> node000001F6D24FFB90 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF510 -> node000001F6D24FF670 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF510 -> node000001F6D2500270 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFDA0 -> node000001F6D24FF460 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFDA0 -> node000001F6D24FF510 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFC40 -> node000001F6D24FF3B0 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFC40 -> node000001F6D24FFDA0 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFCF0 -> node000001F6D24FF300 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFCF0 -> node000001F6D24FFC40 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FEEE0 -> node000001F6D24FEF90 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FEEE0 -> node000001F6D24FFCF0 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFE50 -> node000001F6D24FFF00 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FFFB0 -> node000001F6D24FFAE0 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D2500060 -> node000001F6D24FFA30 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D2500060 -> node000001F6D25001C0 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D2500690 -> node000001F6D2500110 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D2500690 -> node000001F6D2500320 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF980 -> node000001F6D2500530 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24FF980 -> node000001F6D24FF8D0 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D25005E0 -> node000001F6D24FF820 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D25005E0 -> node000001F6D24FF980 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24DDBC0 -> node000001F6D24DE090 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24DDC70 -> node000001F6D24DE560 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24DDC70 -> node000001F6D24DDBC0 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24DE2A0 -> node000001F6D25005E0 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24DE2A0 -> node000001F6D24DDC70 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D2500480 -> node000001F6D2500690 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D2500480 -> node000001F6D24DE2A0 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24DE140 -> node000001F6D2500060 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24DE140 -> node000001F6D2500480 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24DE770 -> node000001F6D24FFFB0 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24DE770 -> node000001F6D24DE140 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24DDB10 -> node000001F6D24FFE50 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24DDB10 -> node000001F6D24DE770 [color = red arrowsize = 1.3 penwidth = 5];
+node000001F6D24DF060 -> node000001F6D24FEEE0 [color = black arrowsize = 1.3 penwidth = 5];
+node000001F6D24DF060 -> node000001F6D24DDB10 [color = red arrowsize = 1.3 penwidth = 5];
 
 }

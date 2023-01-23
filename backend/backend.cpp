@@ -20,7 +20,7 @@ int create_asm (tree_t *tree, const char *file_name)
         fprintf(output, "push 100\n");
         fprintf(output, "pop rbx\n");
         asm_node(tree->root, &table, output);
-
+$
         fprintf(output, "hlt\n");
         tab_table_dtor(&table);
         fclose(output);
@@ -29,12 +29,12 @@ int create_asm (tree_t *tree, const char *file_name)
 
 #define push(num)               fprintf(output, "push %d %s", num, "\n")
 
-#define rel_op(command,name)    log(2, "START Asm %s", #name);                                    \
-                                fprintf(output, "%s %s\n", #command, #name);                      \
-                                fprintf(output, "pop\n");                                         \
-                                push(0);                                                          \
-                                fprintf(output, "%s:\n", #name);                                  \
-                                break;
+#define rel_op(command,name,num)    log(2, "START Asm %s", #name);                                                   \
+                                    fprintf(output, "%s %s%lld\n", #command, #name, num);                            \
+                                    fprintf(output, "pop\n");                                                        \
+                                    push(0);                                                                         \
+                                    fprintf(output, "%s%lld:\n", #name, num);                                        \
+                                    break;
 
 #define switch_table(arg) loc_table ? loc_table->arg: gl_table->arg
 
@@ -100,25 +100,28 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
                 }
                 switch (node->sub_type) {
                 case EQUAL:
-                        rel_op(je, equal)
+                        rel_op(je, equal, table->gl_table->rel_op_size)
                 case N_EQUAL:
-                        rel_op(jne, n_equal)
+                        rel_op(jne, n_equal, table->gl_table->rel_op_size)
                 case GREATER:
-                        rel_op(jb, greater)
+                        rel_op(jb, greater, table->gl_table->rel_op_size)
                 case SMALLER:
-                        rel_op(ja, smaller)
+                        rel_op(ja, smaller, table->gl_table->rel_op_size)
                 case ESMALLER:
-                        rel_op(jbe, esmaller)
+                        rel_op(jbe, esmaller, table->gl_table->rel_op_size)
                 case EGREATER:
-                        rel_op(jae, egreater)
+                        rel_op(jae, egreater, table->gl_table->rel_op_size)
                 default:
                         log(1, "<span style = \"color: red; font-size:16px;\">UNKOWN RELATIVE OPERATOR</span>");
                 }
+                table->gl_table->rel_op_size++;
                 break;
         case CYCLE:
+                $
                 if (node->sub_type == WHILE) {
                         asm_while(output, table, node);
                 }
+                $
                 break;
         case AND:
                 asm_and(output, table, node);
@@ -213,7 +216,7 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
         default:
                 log(2, "Default switch case in assembling(%s)", node->name);
         }
-
+        $
         return 0;
 }
 
@@ -860,10 +863,7 @@ int tab_table_dtor (tab_table_t *table)
 {
         assert_ptr(table);
 
-        resize_table(table->gl_table);
-        for (size_t i = 0; i < table->loc_size; i++) {
-                resize_table(table->loc_tables[i]);
-        }
+        table_dtor(table->gl_table);
 
         if (table->loc_tables) {
                 free(table->loc_tables);

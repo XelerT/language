@@ -7,6 +7,7 @@
 #include "include\graph_tokens.h"
 #include "tree\token_tree.h"
 #include "backend\backend.h"
+#include "tree\tree_2_text.h"
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
@@ -32,8 +33,8 @@ int main (int argc, char *argv[])
         tokens_ctor(&tokens, 100);
 
         get_tokens(&tokens, input_file_name);
-        arr_graph (&tokens, "output_utils\\tokens_graph.dot", "tokens.png");
-        system("make graph_tokens");
+        // arr_graph (&tokens, "output_utils\\tokens_graph.dot", "tokens.png");
+        // system("make graph_tokens");
 
         size_t tp = 0;
         tree.root = get_g(&tokens, &tp, &tree);
@@ -41,22 +42,9 @@ int main (int argc, char *argv[])
         tree_graph(&tree, "output_utils\\tree_graph.dot", "tree.png");
         system("make graph_tree");
 
-        create_asm (&tree, output_file_name);
+        tree_2_text(&tree);
 
-//         char *cmd_line1[] = {
-//                 "asm.exe",
-//                 "output.txt",
-//                 output_file_name
-//         };
-//         log(1, "Run assembler");
-//         main_asm(3, cmd_line1);
-// $
-//         char *cmd_line2[] = {
-//                 "cpu.exe",
-//                 "output.txt",
-//         };
-//         log(1, "Run cpu");
-//         main_cpu(2, cmd_line2);
+        // create_asm (&tree, output_file_name);
 
         tree_dtor(&tree);
         free(tokens.tok_args);
