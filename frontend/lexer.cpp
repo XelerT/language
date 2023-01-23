@@ -142,7 +142,6 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
                         log(1, "here");
                         if (!get_relat_op(token, buf, ip)) {
                                 if (buf[*ip] == '=') {
-                                        $
                                         token->type = ASSIGNMENT;
                                         token->name[0] = buf[*ip];
                                         ++*ip;
@@ -227,7 +226,7 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
         default:
                 return 0;
         }
-        $
+
         return 0;
 }
 

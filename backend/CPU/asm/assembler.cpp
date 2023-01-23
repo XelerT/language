@@ -7,10 +7,6 @@
 #include "assembler.h"
 #include "..\buffer.h"
 
-#define $ fprintf(stderr, "I'm here. File %s Line %d\n", __FILE__, __LINE__);
-// #undef $
-// #define $
-
 int check_argv (int argc, char **argv)
 {
         if (argc != 3)
@@ -100,7 +96,6 @@ int pre_asm (code_t *code)
 
 #define next_line       lines[*lines_counter].ptr = buf + *char_counter;          \
                         lines[*lines_counter].length = temp;                      \
-                        printf("new line %p: %s\n", lines[*lines_counter].ptr, lines[*lines_counter].ptr);       \
                         ++*lines_counter;                                         \
                         *char_counter += temp;
 
@@ -177,62 +172,28 @@ int convert_code (code_t *code, FILE *output_code, int second_cycle, labels_t *l
         char name[MAX_NAME_LENGTH] = {};
         int ip = 0;
 
-        printf("%lld %lld \n", code->n_lines, code->n_chars);
-        // for (int  i = 0; i < 76; i++) {
-        //         printf("%d %s\n", i, code->lines[i].ptr);
-        // }
         for (size_t i = 0; i < code->n_lines; i++) {
-                // printf("here %lld %d\n", i, strlen(code->lines[i].ptr));
-                // printf("%s\n", code->lines[i].ptr);
-                // printf("cmd: %p\n line: %s \n", cmd, code->lines[i].ptr);
-                printf("cmd %s %lld %lld\n", cmd, i, strlen(code->lines[i].ptr));
-                printf("line %s\n", code->lines[i].ptr);
-                printf("sscnafed: %d\n", sscanf(code->lines[i].ptr, "%s", cmd));
-                printf("cmd -%s- %lld ip=%d\n", cmd, i, ip);
-                $
-
+                sscanf(code->lines[i].ptr, "%s", cmd);
+                printf("%s\n", code->lines[i].ptr);
 #include "asm_instructions.en"
 
                 /*else*/ if (strrchr(cmd, ':')) {
                         if (!second_cycle)
                                 create_label(labels, cmd, ip, 0);
                         asm_code[ip++] = CMD_LABEL;
-
                 }
-                $
                 free_buf(cmd);
         }
-        $
-        // for (int i = 0; i <= ip; i++) {
-        //         printf("%d ", asm_code[i]);
-        // }
-        printf("\n\n");
         if (second_cycle) {
-                $
                 return ip;
         } else {
-                $
-                printf("%d %d %p\n", 0, asm_code[0], output_code);
                 if (convert_code(code, output_code, 1, labels, asm_code) == NO_LABEL)
                         return NO_LABEL;
         }
-        $
-        $
-        // FILE* output_code2 = fopen("output3.txt", "w");
-
-        $
-        for (int i = 0; i <= ip; i++) {
-                // printf("%d ", asm_code[i]);
-                $
-                printf("%d %d %p\n", i, asm_code[i], output_code);
-                $
+        for (int i = 0; i <= ip + 1; i++) {
                 fprintf(output_code, "%d ", asm_code[i]);
-                $
-                // if (asm_code[i] == CMD_HLT)
-                        // fprintf(output_code, "\n");
         }
-$
-        // listing(code, asm_code, (char *) __PRETTY_FUNCTION__, __LINE__);
+
         return 0;
 }
 
@@ -253,16 +214,12 @@ int asm_jmp_call (int second_cycle, code_t *code, int *asm_code,
                         return NO_LABEL;
                 // printf("asm line %d\n", asm_code[*ip - 1]);
         } else {
-        $
                 char label_name[MAX_NAME_LENGTH] = {0};
                 sscanf(code->lines[i].ptr + strlen(cmd), "%s", label_name);
-                // if (get_jmp_line(labels, label_name) != NO_LABEL) {
-                $
                         if (stricmp(cmd, "jmp") == 0)
                                 asm_code[(*ip)++] = -1;
                         else if (stricmp(cmd, "call") == 0)
                                 asm_code[(*ip)++] = -2;
-                // }
         }
 
         return 0;

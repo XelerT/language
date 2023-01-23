@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "cpu.h"
 #include "..\..\..\include\utils.h"
+#include "..\..\..\debug\debug.h"
 
-int main_cpu (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
         if (argc != 2) {
                 fprintf(stderr, "Nuzna 2 argumenta\n");

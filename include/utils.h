@@ -1,9 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-const int MAX_NAME_LENGTH = 50;
-const int DEFAULT_N_VARS  = 20;
-const int DEFAULT_N_FUNCS = 20;
+const int MAX_NAME_LENGTH = 64;
+const int DEFAULT_N_VARS  = 16;
+const int DEFAULT_N_FUNCS = 16;
+const int DEFAULT_N_TABLS =  4;
 
 struct graph_node_atr_t {
         const char *shape = "rectangle";
@@ -30,8 +31,5 @@ enum main_errors {
         ALLOC_ERR = 0xBADA110C,
         REALLOC_ERR = 0xBADA110C
 };
-
-int main_asm (int argc, char *argv[]);
-int main_cpu (int argc, char *argv[]);
 
 #endif /*UTILS_H*/

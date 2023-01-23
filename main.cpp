@@ -57,12 +57,10 @@ int main (int argc, char *argv[])
 //         };
 //         log(1, "Run cpu");
 //         main_cpu(2, cmd_line2);
-$
+
         tree_dtor(&tree);
-$
         free(tokens.tok_args);
-$
+
         log_dtor();
-$
         return 0;
 }

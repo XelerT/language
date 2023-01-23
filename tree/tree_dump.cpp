@@ -69,7 +69,7 @@ static const char node_sample_dbl[]  = "node%p [label = \"%lg\"];\n";
 static const char node_sample_c[]    = "node%p [label = \"%c\"];\n";
 static const char node_sample_dec[]  = "node%p [shape = record label = \"{ %d | sub_type: %d}\"];\n";
 
-static const char nodes_tie_atr[] = "node%p -> node%p [color = %s];\n";
+static const char nodes_tie_atr[] = "node%p -> node%p [color = %s arrowsize = %lg penwidth = %d];\n";
 
 
 static FILE *dot_file = nullptr;
@@ -151,10 +151,10 @@ void tie_gv_nodes (node_t *node)
         if (node->right)
                 tie_gv_nodes(node->right);
         if (node->left) {
-                gv_print(nodes_tie_atr, node, node->left, "black");
+                gv_print(nodes_tie_atr, node, node->left, "black", 1.3, node->atr.penwidth);
         }
         if (node->right) {
-                gv_print(nodes_tie_atr, node, node->right, "red");
+                gv_print(nodes_tie_atr, node, node->right, "red", 1.3, node->atr.penwidth);
 
         }
 }

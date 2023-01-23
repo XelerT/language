@@ -41,7 +41,7 @@ node_t* get_el (const tokens_t *tokens, size_t *tp, tree_t *tree)
         };
         node_t *r_node = nullptr;
         log(2, "Type in el %d", arg[*tp].type);
-        $
+
         while (arg[*tp].type == END_LINE || (arg[*tp - 1].type == CL_C_BRACKET && arg[*tp].type != END_FILE
                                                                                && arg[*tp].type != CL_C_BRACKET)) {
                 log(3, "**Token type in EL: %d %s (prev elem: %s)", arg[*tp].type, arg[*tp].name, arg[*tp - 1].name);
@@ -235,7 +235,6 @@ node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 node->right = get_p(tokens, tp, tree);
                 node->atr.fillcolor = "#98B1B5";
         } else if (arg[*tp].type == RELATIVE_OP) {
-                log(2, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! %s", arg[*tp].name);
                 edit_temp(&temp_node, arg + *tp);
                 switch (arg[*tp].name[0]) {
                 case '=':
@@ -276,7 +275,7 @@ node_t* get_p (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tokens);
         assert_ptr(tp);
         assert_ptr(tree);
-        $
+
         node_t *node = nullptr;
 
         if (arg[*tp].type == OP_BRACKET) {
@@ -355,7 +354,7 @@ node_t* get_cb (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tokens);
         assert_ptr(tp);
         assert_ptr(tree);
-        $
+
         node_t *node = nullptr;
 
         if (arg[*tp].type == OP_C_BRACKET) {

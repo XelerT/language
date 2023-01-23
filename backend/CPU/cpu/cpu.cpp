@@ -9,11 +9,12 @@
                                         ip++;                          \
                                         break;
 #define PP_CASE(coeff)  if ((code->cmds[ip] & MASK_CMD) == CMD_PUSH) {                                                  \
-                                if (code->cmds[ip] & ARG_REG) {                                                         \
+                                if ((code->cmds[ip] & ARG_REG) && !(code->cmds[ip] & ARG_RAM)) {                        \
                                         stack_push(stk, cpu->registers[code->cmds[++ip]]);                              \
                                 } else if (code->cmds[ip] & ARG_RAM) {                                                  \
-                                        if (code->cmds[ip] & ARG_REG)                                                   \
+                                        if (code->cmds[ip] & ARG_REG) {                                                 \
                                                 stack_push(stk, cpu->RAM[cpu->registers[code->cmds[++ip]]]);            \
+                                        }                                                                               \
                                         if (code->cmds[ip] & ARG_IMMED) {                                               \
                                                 stack_push(stk, cpu->RAM[code->cmds[++ip]]);                            \
                                         }                                                                               \
@@ -24,8 +25,9 @@
                                 if (code->cmds[ip] & ARG_RAM) {                                                         \
                                         if (code->cmds[ip] & ARG_REG)                                                   \
                                                 cpu->RAM[cpu->registers[code->cmds[++ip]]] = stack_pop(stk);            \
-                                        if (code->cmds[ip] & ARG_IMMED)                                                 \
+                                        if (code->cmds[ip] & ARG_IMMED) {                                               \
                                                 cpu->RAM[code->cmds[++ip]] = stack_pop(stk);                            \
+                                        }                                                                               \
                                 }                                                                                       \
                                 if (code->cmds[ip] & ARG_REG) {                                                         \
                                         cpu->registers[code->cmds[++ip]] = stack_pop(stk);                              \
@@ -51,10 +53,9 @@ int execute_code (code_t *code, stack *stk, cpu_t *cpu)
 
         if (stack_ctor(&call_stack))
                 return CTOR_ERROR;
-        cpu->registers[1] = 10;
 
         while (code->cmds[ip] != CMD_HLT) {
-                printf("NOT HLT1 %d\n", ip);
+                // printf("NOT HLT1 %d\n", ip);
                 switch (code->cmds[ip] & MASK_CMD) {
 #include "..\instructions.en"
                 case CMD_CALL_LABEL:
@@ -65,9 +66,12 @@ int execute_code (code_t *code, stack *stk, cpu_t *cpu)
                 default:
                         ip++;
                 }
-                printf("NOT HLT2 %d\n", ip);
+                // for (int i = 0; i < 20; i++) {
+                //         printf("%d %d", i, cpu->registers[1]);
+                //         $d(cpu->RAM[i]);
+                // }
         }
-printf("HLT %d\n", ip);
+// printf("HLT %d\n", ip);
         return 0;
 }
 
@@ -115,4 +119,16 @@ int source_file_ctor (char *input_file_name, char *argv)
         //         return NO_SOURCE;
 
         return 0;
+}
+
+void append_txt (char *output_file_name)
+{
+        assert(output_file_name);
+
+        if (strstr(output_file_name, ".txt") == nullptr)
+                for (int i = 0; i < MAX_NAME_LENGTH; i++)
+                        if (output_file_name[i] == '\0') {
+                                strcpy(output_file_name + i, ".txt");
+                                break;
+                        }
 }

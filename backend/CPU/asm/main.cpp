@@ -4,12 +4,9 @@
 #include <errno.h>
 #include "assembler.h"
 #include "..\..\..\include\utils.h"
+#include "..\..\..\debug\debug.h"
 
-#define $ fprintf(stderr, "I'm here. File %s Line %d\n", __FILE__, __LINE__);
-// #undef $
-// #define $
-
-int main_asm (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
         if (int i = check_argv(argc, argv))
                 return i;
@@ -17,7 +14,7 @@ int main_asm (int argc, char *argv[])
         FILE *src_code    = nullptr;
         FILE *output_code = nullptr;
         char output_file_name[MAX_NAME_LENGTH] = {};
-        src_code    = fopen(argv[2], "r");
+        src_code = fopen(argv[2], "r");
         if (!src_code) {
                 printf("Source file pointer is null.\n");
                 return NO_SOURCE;
@@ -30,22 +27,25 @@ int main_asm (int argc, char *argv[])
                 fprintf(stderr, "Output_code_file(%s) didn't open.", output_file_name);
                 return NO_SOURCE;
         }
-
+        // fprintf(output_code, "");
         code_t code = {};
 
         labels_t labels[MAX_N_LABELS] = {};
-        int *asm_code = (int*) calloc(code.n_lines * 2, sizeof(int));
+        int *asm_code = (int*) calloc(code.n_lines * 2 * 10, sizeof(int));
         if (!asm_code) {
                 printf("Calloc return null pointer.\n");
                 return NULL_CALLOC;
         }
         get_code(src_code, &code, argv[2]);
+        fclose(src_code);
+
         pre_asm(&code);
-        $
+
         if (convert_code(&code, output_code, 0, labels, asm_code) == NO_LABEL) {
                 fprintf(stderr, "No label\n");
                 return NO_LABEL;
         }
+        return 0;
         $
         free(code.buf);
         $
@@ -54,6 +54,5 @@ int main_asm (int argc, char *argv[])
         free(code.cmds);
         // free(asm_code);
         fclose(output_code);
-        fclose(src_code);
         return 0;
 }

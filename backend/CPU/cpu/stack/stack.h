@@ -7,10 +7,6 @@
 #define ASSERT_OK(stk) stack_dump(stk, __PRETTY_FUNCTION__, __FILE__, __LINE__)
 #define stack_ctor(STACK) oper_stack_ctor(STACK, DEFAULT_CAPACITY, #STACK, __PRETTY_FUNCTION__,__FILE__, __LINE__)
 
-#define $ fprintf(stderr, "I'm here. File %s Line %d\n", __FILE__, __LINE__);
-#undef  $
-#define $
-
 #define FULL_SECURITY //Comment line to turn off canaries and hashes
 #ifdef FULL_SECURITY
 #define CANARY_ON

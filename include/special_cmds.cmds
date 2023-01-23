@@ -1,1 +1,2 @@
 CMD(PRINT, 1, "out\n")
+CMD(SCAN, 2, "in\n")

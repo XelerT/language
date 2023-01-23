@@ -4,9 +4,6 @@
 #include <stdlib.h>
 #include "buffer.h"
 
-#define $ fprintf(stderr, "I'm here. File %s Line %d\n", __FILE__, __LINE__);
-// #define $
-
 void get_code (FILE *input, code_t *code, char *code_file)
 {
         assert(input);
