@@ -1,6 +1,9 @@
 LANG_CFILES = main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp \
 	 frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp backend\backend.cpp tree\tree_2_text.cpp
 
+FRONT_CFILES = frontend\main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp \
+	 frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp backend\backend.cpp tree\tree_2_text.cpp
+
 ASM_CFILES = backend\CPU\buffer.cpp backend\CPU\asm\main.cpp backend\CPU\asm\assembler.cpp
 ASM_OUTPUT = asm.exe
 CPU_CFILES = backend\CPU\buffer.cpp backend\CPU\cpu\stack\stack.cpp backend\CPU\cpu\stack\security.cpp backend\CPU\cpu\main.cpp backend\CPU\cpu\cpu.cpp
@@ -12,6 +15,8 @@ LANG_OUTPUT = lang.exe
 IMG_FORMAT = png
 DOT_FILE_NAME = output_utils\tokens_graph.dot
 UTILS_DIRECTORY = output_utils
+
+FRONT_OUTPUT = front.exe
 
 DRIVE_OUTPUT = drive.exe
 
@@ -58,6 +63,7 @@ CFLAGS= -Wshadow    			\
 all:
 	@ cls
 	@ g++ -o $(LANG_OUTPUT)  $(CFLAGS) $(LANG_CFILES)
+	@ g++ -o $(FRONT_OUTPUT) $(CFLAGS) $(FRONT_CFILES)
 	@ g++ -o $(ASM_OUTPUT)   $(CFLAGS) $(ASM_CFILES)
 	@ g++ -o $(CPU_OUTPUT)   $(CFLAGS) $(CPU_CFILES)
 	@ g++ -o $(DRIVE_OUTPUT) $(CFLAGS) drive.cpp
@@ -76,6 +82,10 @@ run_cpu:
 .PHONY: run_lang
 run_lang:
 	$(LANG_OUTPUT) $(LANG_OUT) $(LANG_CODE)
+
+.PHONY: run_frontend
+run_frontend:
+	$(FRONT_OUTPUT) $(LANG_OUT) $(LANG_CODE)
 
 
 .PHONY: run
@@ -107,7 +117,7 @@ graph_tokens:
 
 .PHONY: graph_tree
 graph_tree:
-	@ dot -T $(IMG_FORMAT) -o output_utils\tree.png output_utils\tree_graph.dot
+	@ dot -T $(IMG_FORMAT) -o $(IMG_PATH) output_utils\tree_graph.dot
 
 .PHONY: run_cpu
 run_cpu:

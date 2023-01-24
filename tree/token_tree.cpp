@@ -456,8 +456,11 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                                 log(1, "Created return");
                                 ++*tp;
                                 node.right = get_p(tokens, tp, tree);
-                        } else {
+                        } else if (arg[*tp].sub_type == PRINT) {
                                 node.sub_type = PRINT;
+                                ++*tp;
+                        } else if (arg[*tp].sub_type == SCAN) {
+                                node.sub_type = SCAN;
                                 ++*tp;
                         }
                         break;
