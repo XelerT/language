@@ -1,2 +1,2 @@
-CMD(PRINT, 1, "out\n")
-CMD(SCAN, 2, "in\n")
+CMD(PRINT, 999, "out\n")
+CMD(SCAN, 998, "in\n")

@@ -43,8 +43,9 @@ void arr_graph (tokens_t *tokens, const char *dot_file_name, const char* png_nam
         gv_print(digraph_atr_sample, "G", G.dpi, G.splines);    /*graph_name, dpi, splines, edge_sample, node_sample*/
         fprintf(dot_file, "{ rank = same;\n");
         print_gv_arr_nodes(tokens);
+$
         tie_gv_arr_nodes(tokens);
-
+$
         log_pic(3, "<img src=\"%s\" width=\"1060\" alt=\"%s\">", png_name, png_name);
 
         fprintf(dot_file, "\n}\n}");
@@ -62,7 +63,7 @@ void print_gv_arr_nodes (tokens_t *tokens)
         for (size_t i = 0; i < tokens->size; i++) {
                 node = tokens->tok_args + i;
                 gv_print(node_atr_sample, node, node->atr.shape, node->atr.style, node->atr.height,
-                         node->atr.width, node->atr.fixedsize, node->atr.fillcolor,node->atr.fontsize,
+                         node->atr.width, node->atr.fixedsize, node->atr.fillcolor, node->atr.fontsize,
                          node->atr.penwidth);
 
                 const char node_sample_data_t[]  = "node%p [shape = record label = \"{%s | {%s | %d}}\"];\n";

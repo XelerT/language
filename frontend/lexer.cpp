@@ -89,7 +89,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
 
         log(2, "%lld", tokens->size);
         tokens->tok_args[tokens->size].type = END_FILE;
-        log(4, "token(%lld) is \"%s\", type: %c", tokens->size, tokens->tok_args[tokens->size].name,
+        log(4, "token(%lld) is \"%s\", type: %d", tokens->size, tokens->tok_args[tokens->size].name,
                                        tokens->tok_args[tokens->size].type);
 
         tokens->tok_args[tokens->size].name[0] = '/';
@@ -229,6 +229,8 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
 
         return 0;
 }
+
+#undef SYMB
 
 #define SYMB(key,arg,num,type_arg,is,code) case arg:                                                          \
                                                         if (!key) {                                                   \

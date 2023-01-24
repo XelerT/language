@@ -11,15 +11,15 @@ enum backend_errors {
 
 struct variable_t {
         char name[MAX_NAME_LENGTH] = {'\0'};
-        elem_t val = 0;
-        int number = 0;
-        char type  = 0;
+        elem_t val         = 0;
+        int number         = 0;
+        unsigned int type  = 0;
 };
 
 struct function_t {
         char name[MAX_NAME_LENGTH] = {'\0'};
-        size_t n_args = 0;
-        char type     = 0;
+        size_t n_args         = 0;
+        unsigned int type     = 0;
 };
 
 struct table_t {

@@ -20,7 +20,7 @@ int create_asm (tree_t *tree, const char *file_name)
         fprintf(output, "push 100\n");
         fprintf(output, "pop rbx\n");
         asm_node(tree->root, &table, output);
-$
+
         fprintf(output, "hlt\n");
         tab_table_dtor(&table);
         fclose(output);
@@ -117,11 +117,9 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
                 table->gl_table->rel_op_size++;
                 break;
         case CYCLE:
-                $
                 if (node->sub_type == WHILE) {
                         asm_while(output, table, node);
                 }
-                $
                 break;
         case AND:
                 asm_and(output, table, node);
@@ -216,7 +214,6 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
         default:
                 log(2, "Default switch case in assembling(%s)", node->name);
         }
-        $
         return 0;
 }
 
@@ -264,14 +261,14 @@ int var_init (table_t *gl_table, table_t *loc_table, int sub_type, char *name)
                 }
 
                 loc_table->vars[loc_table->var_size].val  = 0;
-                loc_table->vars[loc_table->var_size].type = (char) sub_type;                ////////////////////////////////////TODO
+                loc_table->vars[loc_table->var_size].type = sub_type;
                 strcpy(loc_table->vars[loc_table->var_size].name, name);
                 loc_table->var_size++;
 
                 log(2, "Added to local var_table \"%s\" variable", loc_table->vars[loc_table->var_size - 1].name);
         } else {
                 gl_table->vars[gl_table->var_size].val  = 0;
-                gl_table->vars[gl_table->var_size].type = (char) sub_type;
+                gl_table->vars[gl_table->var_size].type = sub_type;
                 strcpy(gl_table->vars[gl_table->var_size].name, name);
                 gl_table->var_size++;
 
@@ -748,12 +745,12 @@ int asm_assignment (FILE *output, node_t *node, tab_table_t *table)
         assert_ptr(node);
         assert_ptr(table);
 
-        int first_in_loc_table = 0;
-        int sec_in_loc_table = 0;
-        char first_var_type = 0;
-        char second_var_type = 0;
-        size_t n_loc_table1 = 0;
-        size_t n_loc_table2 = 0;
+        int first_in_loc_table       = 0;
+        int sec_in_loc_table         = 0;
+        unsigned int first_var_type  = 0;
+        unsigned int second_var_type = 0;
+        size_t n_loc_table1          = 0;
+        size_t n_loc_table2          = 0;
 
         table_t *gl_table = table->gl_table;
 

@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tree\text_tree.h"
-#include "tree\tree_dump.h"
-#include "include\lexer.h"
-#include "include\graph_tokens.h"
-#include "tree\token_tree.h"
-#include "backend\backend.h"
-#include "tree\tree_2_text.h"
+#include "..\tree\text_tree.h"
+#include "..\tree\tree_dump.h"
+#include "..\include\lexer.h"
+#include "..\include\graph_tokens.h"
+#include "..\tree\token_tree.h"
+#include "backend.h"
+#include "..\tree\tree_2_text.h"
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
@@ -34,9 +34,7 @@ int main (int argc, char *argv[])
         tree_graph(&tree, "output_utils\\tree_graph.dot", "tree.png");
         system("make graph_tree IMG_PATH=output_utils\\tree.png");
 
-        tree_2_text(&tree, "tree.txt");
-
-        // create_asm (&tree, output_file_name);
+        create_asm (&tree, output_file_name);
 
         tree_dtor(&tree);
 

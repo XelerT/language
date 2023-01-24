@@ -420,10 +420,11 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
 
         size_t prev_tp = *tp;
         node_t node = {};
-        int recycle = 1;
+        int recycle = -1;
         log(2, "GET_N token type: %d", arg[*tp].type);
 
         while (recycle) {
+                recycle = 1;
                 switch (arg[*tp].type) {
                 case NUMBER:
                         node.data = arg[*tp].val;
@@ -465,8 +466,9 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                         }
                         break;
                 default:
-                        recycle = 0;
                         log(3, "Default case: token type: \"%d\", name: \"%s\"", arg[*tp].type, arg[*tp].name);
+                        assert(recycle == 1);
+                        recycle = 0;
                 }
         }
 

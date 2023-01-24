@@ -30,7 +30,7 @@ struct node_t {
         int new_node               =       0;
         elem_t data                =       0;
         unsigned int  type         =       0;
-        char sub_type              =       0;
+        unsigned int sub_type      =       0;
         char name[MAX_NAME_LENGTH] =      {};
         int  casted                =       0;
 

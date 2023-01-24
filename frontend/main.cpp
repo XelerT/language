@@ -40,14 +40,10 @@ int main (int argc, char *argv[])
         size_t tp = 0;
         tree.root = get_g(&tokens, &tp, &tree);
 
-        // text_2_tree(&tree);
-
         tree_graph(&tree, "output_utils\\tree_graph.dot", "front_tree.png");
         system("make graph_tree IMG_PATH=output_utils\\front_tree.png");
 
         tree_2_text(&tree, "tree.txt");
-
-        // create_asm (&tree, output_file_name);
 
         tree_dtor(&tree);
         free(tokens.tok_args);
