@@ -33,12 +33,12 @@ int pre_asm (code_t *code)
         size_t n_oper = count_op(code);
         if (!n_oper)
                 return 0;
-        char *buf = (char*) calloc(code->n_chars + n_oper * 50, sizeof(char));
+        char *buf = (char*) calloc(code->n_chars + n_oper * 50 + 1, sizeof(char));
         if (!buf) {
                 fprintf(stderr, "Calloc returned NULL.\n");
                 return NULL_CALLOC;
         }
-        line_t *lines = (line_t*) calloc(code->n_lines + n_oper * 5, sizeof(line_t));
+        line_t *lines = (line_t*) calloc(code->n_lines + n_oper * 5 + 1, sizeof(line_t));
         if (!lines) {
                 fprintf(stderr, "Calloc returned NULL.\n");
                 return NULL_CALLOC;
@@ -190,10 +190,11 @@ int convert_code (code_t *code, FILE *output_code, int second_cycle, labels_t *l
                 if (convert_code(code, output_code, 1, labels, asm_code) == NO_LABEL)
                         return NO_LABEL;
         }
-        for (int i = 0; i <= ip + 1; i++) {
+        for (int i = 0; i < ip; i++) {
                 fprintf(output_code, "%d ", asm_code[i]);
         }
-        // listing (code, asm_code, "saxcxc", 196);
+
+        // listing (code, asm_code, "fuck", 69);
 
         return 0;
 }
@@ -211,16 +212,18 @@ int asm_jmp_call (int second_cycle, code_t *code, int *asm_code,
 
         if (second_cycle) {
                 sscanf(code->lines[i].ptr + strlen(cmd), "%s", name);
-                if ((asm_code[(*ip)++] = get_jmp_line(labels, name)) == NO_LABEL)
+                if ((asm_code[*ip] = get_jmp_line(labels, name)) == NO_LABEL)
                         return NO_LABEL;
+                // printf("asm line %d\n", asm_code[*ip - 1]);
         } else {
                 char label_name[MAX_NAME_LENGTH] = {0};
                 sscanf(code->lines[i].ptr + strlen(cmd), "%s", label_name);
                         if (stricmp(cmd, "jmp") == 0)
-                                asm_code[(*ip)++] = -1;
+                                asm_code[*ip] = -1;
                         else if (stricmp(cmd, "call") == 0)
-                                asm_code[(*ip)++] = -2;
+                                asm_code[*ip] = -2;
         }
+        ++*ip;
 
         return 0;
 }
@@ -255,9 +258,6 @@ int get_pp_code (const char *val, int *asm_code, const char *cmd, int coeff)
                                 num |= ARG_IMMED;
                         } else if (sscanf(val, "%d", asm_code))
                                 num = ARG_IMMED;
-                } else if ((stricmp(cmd, "pop") == 0) || (stricmp(cmd, "pop") == 0)) {
-                        *asm_code = 0;
-                        num |= ARG_IMMED;
                 }
         }
 
@@ -281,39 +281,40 @@ void listing (code_t *code, int *asm_code, char *function, int line)
                 if (*code->lines[i].ptr != '\0' && *code->lines[i].ptr != '\n')
                         switch (asm_code[ip] & MASK_CMD) {
                         case CMD_PUSH:
-                                printf("%s\t | %d %d\n", code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
+                                printf("%d %d %s\t | %d %d\n", ip, ip + 1, code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
                                 ip++;
                                 break;
                         case CMD_PUSHF:
-                                printf("%s\t | %d %d\n", code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
+                                printf("%d %d %s\t | %d %d\n", ip, ip + 1, code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
                                 ip++;
                                 break;
                         case CMD_POPF:
                                 if ((asm_code[ip] & ARG_REG) || (asm_code[ip] & ARG_RAM))
-                                        printf("%s\t | %d %d\n", code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
+                                        printf("%d %d | %s\t | %d %d\n", ip, ip + 1, code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
                                 if (asm_code[ip] & ARG_IMMED)
-                                        printf("%s\t | %d\n", code->lines[i].ptr, asm_code[ip]);
+                                        printf("%d %s\t | %d\n", ip, code->lines[i].ptr, asm_code[ip]);
                                 ip++;
                                 break;
                         case CMD_POP:
                                 if ((asm_code[ip] & ARG_REG) || (asm_code[ip] & ARG_RAM))
-                                        printf("%s\t | %d %d\n", code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
+                                        printf("%d %d %s\t | %d %d\n", ip, ip + 1, code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
                                 if (asm_code[ip] & ARG_IMMED)
-                                        printf("%s\t | %d\n", code->lines[i].ptr, asm_code[ip]);
+                                        printf("%d %d %s\t | %d\n", ip, ip + 1, code->lines[i].ptr, asm_code[ip]);
                                 ip++;
                                 break;
-                        case CMD_JMP:
                         case CMD_JA:
+                        case CMD_JB:
                         case CMD_JE:
-                                printf("%s\t | %d %d\n", code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
+                        case CMD_JMP:
+                                printf("%d %d %s\t | %d %d\n", ip, ip + 1, code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
                                 ip++;
                                 break;
                         case CMD_CALL:
-                                printf("%s\t | %d %d\n", code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
+                                printf("%d %d %s\t | %d %d\n", ip, ip + 1, code->lines[i].ptr, asm_code[ip], asm_code[ip + 1]);
                                 ip++;
                                 break;
                         default:
-                                printf("*%s\t | %d\n", code->lines[i].ptr, asm_code[ip]);
+                                printf("%d *%s\t | %d\n", ip, code->lines[i].ptr, asm_code[ip]);
                                 break;
                         }
                 else

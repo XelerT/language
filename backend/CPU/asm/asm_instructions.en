@@ -6,7 +6,8 @@
 
 #define DEF_CMD(name_,num,arg,...)                       \
                 if (stricmp(cmd,#name_) == 0) {          \
-                        asm_code[ip++] = CMD_##name_;    \
+                        asm_code[ip] = CMD_##name_;      \
+                        ip++;                            \
                 } else
 
 #define DEF_STND_CMD(name_,num,arg,...)                 \

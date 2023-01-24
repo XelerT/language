@@ -29,15 +29,16 @@ int main (int argc, char *argv[])
         }
         // fprintf(output_code, "");
         code_t code = {};
-
         labels_t labels[MAX_N_LABELS] = {};
+
+        get_code(src_code, &code, argv[2]);
+        fclose(src_code);
+
         int *asm_code = (int*) calloc(code.n_lines * 2 * 10, sizeof(int));
         if (!asm_code) {
                 printf("Calloc return null pointer.\n");
                 return NULL_CALLOC;
         }
-        get_code(src_code, &code, argv[2]);
-        fclose(src_code);
 
         pre_asm(&code);
 

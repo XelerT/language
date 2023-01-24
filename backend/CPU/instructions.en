@@ -30,13 +30,13 @@ DEF_CMD(RET, 15, 1, {int temp_ip = stack_pop(&call_stack); if (temp_ip == POISON
 
 DEF_CMD(SQRT, 16, 1, {PUSH((elem_t)sqrt(POP));})
 
-DEF_J_CMD(JMP, 11, 1, {JMP})
-DEF_J_CMD(JB, 17, 1,  {if (POP  < POP) JMP ip++;})
-DEF_J_CMD(JBE, 18, 1, {if (POP <= POP) JMP ip++;})
-DEF_J_CMD(JA, 19, 1,  {if (POP  > POP) JMP ip++;})
-DEF_J_CMD(JAE, 20, 1, {if (POP >= POP) JMP ip++;})
-DEF_J_CMD(JE, 21, 1,  {if (POP == POP) JMP ip++;})
-DEF_J_CMD(JNE, 22, 1, {if (POP != POP) JMP ip++;})
+DEF_J_CMD(JMP, 11, 1,  {JMP})
+DEF_J_CMD(JB,  17, 1,  {if (POP  < POP) JMP else ip++;})
+DEF_J_CMD(JBE, 18, 1,  {if (POP <= POP) JMP else ip++;})
+DEF_J_CMD(JA,  19, 1,  {if (POP  > POP) JMP else ip++;})
+DEF_J_CMD(JAE, 20, 1,  {if (POP >= POP) JMP else ip++;})
+DEF_J_CMD(JE,  21, 1,  {if (POP == POP) JMP else ip++;})
+DEF_J_CMD(JNE, 22, 1,  {if (POP != POP) JMP else ip++;})
 
 
 DEF_STND_CMD(PUSHF, 23, 1, {PP_CASE(threshold)})

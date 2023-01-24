@@ -23,12 +23,12 @@
                                 }                                                                                       \
                         } else if ((code->cmds[ip] & MASK_CMD) == CMD_POP) {                                            \
                                 if (code->cmds[ip] & ARG_RAM) {                                                         \
-                                        if (code->cmds[ip] & ARG_REG)                                                   \
-                                                cpu->RAM[cpu->registers[code->cmds[++ip]]] = stack_pop(stk);            \
+                                        if (code->cmds[ip] & ARG_REG) {                                                 \
+                                                cpu->RAM[cpu->registers[code->cmds[++ip]]] = stack_pop(stk);}           \
                                         if (code->cmds[ip] & ARG_IMMED) {                                               \
                                                 cpu->RAM[code->cmds[++ip]] = stack_pop(stk);                            \
                                         }                                                                               \
-                                }                                                                                       \
+                                } else                                                                                  \
                                 if (code->cmds[ip] & ARG_REG) {                                                         \
                                         cpu->registers[code->cmds[++ip]] = stack_pop(stk);                              \
                                 }                                                                                       \
@@ -55,7 +55,6 @@ int execute_code (code_t *code, stack *stk, cpu_t *cpu)
                 return CTOR_ERROR;
 
         while (code->cmds[ip] != CMD_HLT) {
-                // printf("%d cmd: %d\n", ip, code->cmds[ip]);
                 switch (code->cmds[ip] & MASK_CMD) {
 #include "..\instructions.en"
                 case CMD_CALL_LABEL:

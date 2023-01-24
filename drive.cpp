@@ -31,14 +31,14 @@ int main (int argc, char *argv[])
         char run_asm[MAX_NAME_LENGTH * 2] = {};
         sprintf(run_asm, "make run_asm ASM_OUT=%s ASM_CODE=%s", "output.txt", output_file_name);
 
-        // system(run_asm);
-        // fprintf(stderr, "\nRun assembler\n\n");
+        system(run_asm);
+        fprintf(stderr, "\nRun assembler\n\n");
 
         char run_cpu[MAX_NAME_LENGTH * 2] = {};
         sprintf(run_cpu, "make run_cpu CPU_CODE=%s", "output.txt");
 
-        // system(run_cpu);
-        // fprintf(stderr, "\nRun cpu\n\n");
+        system(run_cpu);
+        fprintf(stderr, "\nRun cpu\n\n");
 
         return 0;
 }

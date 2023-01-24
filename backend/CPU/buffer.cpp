@@ -14,7 +14,7 @@ void get_code (FILE *input, code_t *code, char *code_file)
         if (stat(code_file, &file) < 0)
                 return;
         size_t n_chars = 0;
-        char *buf = (char*) calloc(file.st_size + 1 + 1000, sizeof(char));
+        char *buf = (char*) calloc(file.st_size + 1, sizeof(char));
         if (!buf) {
                 printf("Calloc returned NULL.\n");
                 return;
@@ -41,7 +41,7 @@ void divide_code (code_t *code)
 
         buf[code->n_chars + 1] = '\0';
 
-        line_t *lines = (line_t*) calloc(code->n_lines + 1 + 1000, sizeof(line_t));
+        line_t *lines = (line_t*) calloc(code->n_lines + 1, sizeof(line_t));
         if (!lines) {
                 printf("Calloc returned NULL.\n");
                 return;
