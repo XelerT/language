@@ -137,7 +137,7 @@ void print_gv_nodes (node_t *node)
                 gv_print(node_sample_ass, node, node->name, ";");
                 log(3, "Graph end_line %s type \"%d\"", ";", node->type);
         } else if (node->type == STAFF) {
-                gv_print(node_sample_str, node, "return");
+                gv_print(node_sample_str, node, node->name);
                 log(1, "Graph return");
         } else {
                 gv_print(node_sample_str, node, node->name);

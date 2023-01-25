@@ -77,6 +77,7 @@ int write_node_data (FILE *text_tree, node_t *node)
         case OPERATOR:
                 print("%d %d %d", node->type, node->sub_type, node->right ? 1 : 0);
                 break;
+        case NEXT_ELEM:
         case END_LINE:
                 print("%d %d", node->type, node->right ? 1 : 0);
                 break;
@@ -287,6 +288,7 @@ int read_special_node_data (char *buf, size_t *counter, node_t *node)
                 sscanf(buf + *counter, "%d %n", &node->sub_type, &indent);
                 *counter += indent;
                 break;
+        case NEXT_ELEM:
         case END_LINE:
                 break;
         default:
@@ -338,6 +340,7 @@ int read_special_node_data (char *buf, size_t *counter, node_t *node)
                 else
                         node->atr.fillcolor = "#F51E2A";
                 break;
+        case NEXT_ELEM:
         case END_LINE:
                 node->atr.fillcolor = "#BDCCF2";
                 break;

@@ -412,6 +412,12 @@ node_t* get_func (const tokens_t *tokens, size_t *tp, tree_t *tree)
         return node;
 }
 
+#define CMD(cmd_name, ...)      if (arg[*tp].sub_type == cmd_name) {                    \
+                                        node.sub_type = cmd_name;                       \
+                                        strcpy(node.name, #cmd_name);                   \
+                                        log(2, "Created %s", #cmd_name);                \
+                                } else                                                  \
+
 node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
 {
         assert_ptr(tokens);
@@ -452,18 +458,16 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                         break;
                 case STAFF:
                         node.type = STAFF;
-                        if (arg[*tp].sub_type == RETURN) {
-                                node.sub_type = RETURN;
-                                log(1, "Created return");
-                                ++*tp;
-                                node.right = get_p(tokens, tp, tree);
-                        } else if (arg[*tp].sub_type == PRINT) {
-                                node.sub_type = PRINT;
-                                ++*tp;
-                        } else if (arg[*tp].sub_type == SCAN) {
-                                node.sub_type = SCAN;
-                                ++*tp;
+#include "..\include\special_cmds.cmds"
+                        /*else*/ if (arg[*tp].sub_type == RETURN) {
+                                        node.sub_type = RETURN;
+                                        strcpy(node.name, "return");
+                                        log(1, "Created return");
+                        } else {
+                                log(1, "Unknown standart command");
                         }
+                        ++*tp;
+                        node.left = get_e(tokens, tp, tree);
                         break;
                 default:
                         log(3, "Default case: token type: \"%d\", name: \"%s\"", arg[*tp].type, arg[*tp].name);

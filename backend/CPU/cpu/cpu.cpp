@@ -24,13 +24,17 @@
                         } else if ((code->cmds[ip] & MASK_CMD) == CMD_POP) {                                            \
                                 if (code->cmds[ip] & ARG_RAM) {                                                         \
                                         if (code->cmds[ip] & ARG_REG) {                                                 \
-                                                cpu->RAM[cpu->registers[code->cmds[++ip]]] = stack_pop(stk);}           \
+                                                cpu->RAM[cpu->registers[code->cmds[++ip]]] = stack_pop(stk);            \
+                                                }                                                                       \
                                         if (code->cmds[ip] & ARG_IMMED) {                                               \
                                                 cpu->RAM[code->cmds[++ip]] = stack_pop(stk);                            \
                                         }                                                                               \
                                 } else                                                                                  \
                                 if (code->cmds[ip] & ARG_REG) {                                                         \
                                         cpu->registers[code->cmds[++ip]] = stack_pop(stk);                              \
+                                } else if (code->cmds[ip] & CMD_POP) {                                                  \
+                                        stack_pop(stk);                                                                 \
+                                        ip++;                                                                           \
                                 }                                                                                       \
                         }
 

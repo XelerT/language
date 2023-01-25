@@ -1,0 +1,14 @@
+int func (int i) {
+        if (i < 1) {
+                return 1;
+        }
+        return i * func(i - 1);
+}
+
+int main (int i) {
+        int k = 0;
+        scan k;
+        print k;
+        print func(k);
+}
+

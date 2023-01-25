@@ -11,15 +11,16 @@ enum backend_errors {
 
 struct variable_t {
         char name[MAX_NAME_LENGTH] = {'\0'};
-        elem_t val         = 0;
-        int number         = 0;
-        unsigned int type  = 0;
+        elem_t val                 =      0;
+        int number                 =      0;
+        unsigned int type          =      0;
 };
 
 struct function_t {
         char name[MAX_NAME_LENGTH] = {'\0'};
-        size_t n_args         = 0;
-        unsigned int type     = 0;
+        size_t n_args              =      0;
+        unsigned int type          =      0;
+        int has_return             =      0;
 };
 
 struct table_t {
@@ -48,11 +49,8 @@ struct tab_table_t {
 
 int create_asm     (tree_t *tree, const char *file_name);
 int asm_node       (node_t *node, tab_table_t *table, FILE *output);
+
 int var_init       (table_t *gl_table, table_t *loc_table, int sub_type, char *name);
-int table_ctor     (table_t *table, size_t var_cap, size_t func_cap);
-int resize_table   (table_t *table);
-int table_dtor     (table_t *table);
-size_t find_var    (table_t *table, char *name);
 int asm_while      (FILE *output, tab_table_t *table, node_t *node);
 int asm_and        (FILE *output, tab_table_t *table, node_t *node);
 int asm_or         (FILE *output, tab_table_t *table, node_t *node);
@@ -60,12 +58,23 @@ int asm_operator   (FILE *output, tab_table_t *table, node_t *node);
 int func_init      (FILE *output, node_t *node, tab_table_t *table);
 int asm_name       (FILE *output, tab_table_t *table, node_t *node);
 int asm_func       (FILE *output, node_t *node, tab_table_t *table);
-size_t count_args  (node_t *node);
-int cast_type      (node_t *node, tab_table_t *table);
+int asm_scan       (FILE *output, node_t *node, tab_table_t *table);
 int asm_assignment (FILE *output, node_t *node, tab_table_t *table);
+int asm_staff      (FILE *output, node_t *node, tab_table_t *table);
+int asm_return     (FILE *output, tab_table_t *table);
+
+size_t count_args  (node_t *node);
+int    cast_type   (node_t *node, tab_table_t *table);
+size_t find_var    (table_t *table, char *name);
+
+int table_ctor     (table_t *table, size_t var_cap, size_t func_cap);
+int resize_table   (table_t *table);
+int table_dtor     (table_t *table);
 
 int tab_table_ctor   (tab_table_t *table, size_t capacity);
 int resize_tab_table (tab_table_t *table);
 int tab_table_dtor   (tab_table_t *table);
+
+int indent_rbx (FILE *output, size_t n_args);
 
 #endif /*BACKEND_H*/

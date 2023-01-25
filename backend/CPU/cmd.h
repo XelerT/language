@@ -38,7 +38,6 @@ enum cmd {
 #undef DEF_J_CMD
 
 enum errors {
-        LEX_ERROR      = -8,
         NO_REGISTER    = -7,
         DIVIDE_ERR     = -6, //
         NO_LABEL       = -5, // 0x Hex speak

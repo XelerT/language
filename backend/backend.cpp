@@ -38,9 +38,6 @@ int create_asm (tree_t *tree, const char *file_name)
 
 #define switch_table(arg) loc_table ? loc_table->arg: gl_table->arg
 
-#define CMD(name,num,asm_code) else if (node->sub_type == name)                 \
-                                        fprintf(output, "%s", asm_code);
-
 #pragma GCC diagnostic ignored "-Wlogical-op"
 
 int asm_node (node_t *node, tab_table_t *table, FILE *output)
@@ -55,7 +52,8 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
             node->type != CYCLE && node->type != RELATIVE_OP         &&
             node->type != FUNC_INIT && node->type != FUNC            &&
             node->type != ADD_OPERATOR && node->type != SUB_OPERATOR &&
-            node->type != MUL_OPERATOR && node->type != DIV_OPERATOR) {
+            node->type != MUL_OPERATOR && node->type != DIV_OPERATOR &&
+            node->type != STAFF) {
                 if (node->type != ASSIGNMENT || node->left->type != NAME)
                         asm_node(node->left, table, output);
         }
@@ -79,10 +77,7 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
                 fprintf(output, "call %s\n", node->name);
                 break;
         case STAFF:
-                if (node->sub_type == RETURN) {
-                        asm_node(node->right, table, output);
-                }
-#include "..\include\special_cmds.cmds"
+                asm_staff(output, node, table);
                 break;
         case FUNC_INIT:
                 func_init(output, node, table);
@@ -90,7 +85,6 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
                 log(2, "Initialized \"%s\" function", node->name);
                 break;
         case RELATIVE_OP:
-
                 push(1);
                 if (node->left) {
                         asm_node(node->left, table, output);
@@ -137,7 +131,6 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
                 if (var_init(gl_table, table->loc_size > 0 ? table->loc_tables[table->loc_size - 1]: nullptr, node->sub_type, node->name)) {
                         return INIT_ERROR;
                 }
-
                 log(2, "Initialized \"%s\" variable", node->name);
                 break;
         case ASSIGNMENT:
@@ -221,6 +214,37 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
 #undef rel_op
 #undef switch_table
 #undef asm_name
+
+int indent_rbx (FILE *output, size_t n_args)
+{
+        assert_ptr(output);
+
+        fprintf(output, "pop rdx\n");
+        fprintf(output, "push rbx\n");
+        fprintf(output, "push rbx\n");
+        fprintf(output, "push %lld\n", n_args);
+        fprintf(output, "add\n");
+        fprintf(output, "pop rbx\n");
+        fprintf(output, "push rdx\n");
+
+        log(2, "Indent rbx on %lld", n_args);
+
+        return 0;
+}
+
+int asm_return (FILE *output, tab_table_t *table)
+{
+        assert_ptr(output);
+
+        fprintf(output, "pop  rdx\n");
+        fprintf(output, "pop  rbx\n");
+        fprintf(output, "push rdx\n");
+        fprintf(output, "ret\n");
+
+        table->gl_table->funcs[table->gl_table->func_size].has_return = 1;
+
+        return 0;
+}
 
 size_t find_var (table_t *table, char *name)
 {
@@ -460,10 +484,19 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
 
         table_t *gl_table = table->gl_table;
         resize_table(gl_table);
+        int is_main = 1;
+
+        if (strcmp(node->name, "main")) {
+                fprintf(output, "\njmp skip%lld \n", gl_table->func_size);
+                is_main = 0;
+        }
+        fprintf(output, "%s:\n", node->name);
 
         table_t loc_table = {};
 
-        if (count_args(node)) {
+        size_t n_args = count_args(node);
+
+        if (n_args) {
                 table_ctor(&loc_table, DEFAULT_N_VARS, 0);
 
                 if (resize_tab_table(table))
@@ -472,12 +505,13 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
                 loc_table.var_size = count_args(node->left);
         }
 
-        fprintf(output, "\njmp skip%lld \n", gl_table->func_size);
-        fprintf(output, "%s:\n", node->name);
-
         asm_node(node->left, table, output);
 
-        for (size_t i = loc_table.var_size - 1; i > 0; i--) {
+
+        if (loc_table.var_cap && !is_main)
+                indent_rbx(output, n_args);
+
+        for (size_t i = loc_table.var_size - 1; i > 0 && !is_main; i--) {
                 if (loc_table.vars[i].type == INT)
                         fprintf(output, "pop [rbx + %lld]\n", i);
                 else if (loc_table.vars[i].type == FLOAT)
@@ -488,8 +522,13 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
 
         asm_node(node->right, table, output);
 
-        fprintf(output, "ret\n");
-        fprintf(output, "skip%lld:\n\n", gl_table->func_size);
+        if (!gl_table->funcs[gl_table->func_size].has_return && !is_main) {
+                asm_return(output, table);
+        }
+
+        if (!is_main) {
+                fprintf(output, "skip%lld:\n\n", gl_table->func_size++);
+        }
 
         log(2, "Assmed \"%s\" function", node->name);
         table_dtor(&loc_table);
@@ -868,6 +907,52 @@ int tab_table_dtor (tab_table_t *table)
                 log(1, "<span style = \"color: green; font-size:14px;\"> Freed local tables </span>");
         } else {
                 log(1, "<span style = \"color: #436AE8; font-size:14px;\"> Destructor of table tried to free variables pointer </span>");
+        }
+
+        return 0;
+}
+
+int asm_scan (FILE *output, node_t *node, tab_table_t *table)
+{
+        assert_ptr(node);
+        assert_ptr(table);
+        assert_ptr(output);
+
+        fprintf(output, "in\n");
+
+        if (node->type == NUMBER) {
+                log(1, "<span style = \"color: red; font-size:18px;\"> Tried to scan in number </span>");
+                return LEX_ERROR;
+        } else if (node->type == NAME) {
+                size_t indent = find_var(table->gl_table, node->name);
+                int in_loc_table = 0;
+
+                if (indent == SIZE_T_ERROR && table->loc_size > 0) {
+                        for (size_t i = 0; i < table->loc_size && indent == SIZE_T_ERROR; i++) {
+                                indent = find_var(table->loc_tables[i], node->name);
+                        }
+                        in_loc_table = 1;
+                }
+                fprintf(output, "pop [%s + %lld]\n", in_loc_table ? "rbx": "rax", indent);
+        }
+
+        return 0;
+}
+
+int asm_staff (FILE *output, node_t *node, tab_table_t *table)
+{
+        assert_ptr(node);
+        assert_ptr(table);
+        assert_ptr(output);
+
+        if (node->sub_type == RETURN) {
+                asm_node(node->left, table, output);
+                asm_return(output, table);
+        } else if (node->sub_type == SCAN) {
+                asm_scan(output, node->left, table);
+        } else if (node->sub_type == PRINT) {
+                asm_node(node->left, table, output);
+                fprintf(output, "out\n");
         }
 
         return 0;
