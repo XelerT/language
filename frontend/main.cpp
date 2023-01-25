@@ -32,7 +32,9 @@ int main (int argc, char *argv[])
         tokens_t tokens = {};
         tokens_ctor(&tokens, 100);
 
-        get_tokens(&tokens, input_file_name);
+        int execution_status = get_tokens(&tokens, input_file_name);
+        if (execution_status)
+                return execution_status;
 
         // arr_graph (&tokens, "output_utils\\tokens_graph.dot", "tokens.png");
         // system("make graph_tokens");
@@ -43,9 +45,13 @@ int main (int argc, char *argv[])
         tree_graph(&tree, "output_utils\\tree_graph.dot", "front_tree.png");
         system("make graph_tree IMG_PATH=output_utils\\front_tree.png");
 
-        tree_2_text(&tree, "tree.txt");
+        execution_status = tree_2_text(&tree, "tree.txt");
+        if (execution_status)
+                return execution_status;
 
-        tree_dtor(&tree);
+        execution_status = tree_dtor(&tree);
+        if (execution_status)
+                return execution_status;
         free(tokens.tok_args);
 
         log_dtor();

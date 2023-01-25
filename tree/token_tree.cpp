@@ -361,7 +361,7 @@ node_t* get_cb (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 ++*tp;
                 log(2, "Type after { %d", arg[*tp].type);
                 node = get_el(tokens, tp, tree);
-                log(2, "Type in cb: %d", arg[*tp].type);
+                log(3, "Type in cb: %d name: %s", arg[*tp].type, arg[*tp].name);
                 assert(arg[*tp].type == CL_C_BRACKET);
                 ++*tp;
         } else {
@@ -391,7 +391,10 @@ node_t* get_func (const tokens_t *tokens, size_t *tp, tree_t *tree)
                         temp_node.atr.fillcolor = "#EB8CD5";
 
                         node = tree_insert(&temp_node);
-                        node->left  = get_p(tokens, tp, tree);
+                        if (arg[*tp + 1].type != CL_BRACKET)
+                                node->left  = get_p(tokens, tp, tree);
+                        else
+                                *tp += 2;
                         node->right = get_cb(tokens, tp, tree);
         } else if (arg[*tp].type == NAME && arg[*tp + 1].type == OP_BRACKET) {
                 node_t temp_node = {};
@@ -454,6 +457,7 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                                 node.atr.fillcolor = "#93F558";
                         } else {
                                 log(1, "<span style = \"color: red; font-size:16px;\">!No variable name after data type!</span>");
+                                recycle = 0;
                         }
                         break;
                 case STAFF:

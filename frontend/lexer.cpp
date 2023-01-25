@@ -32,17 +32,20 @@ int resize_tokens (tokens_t *tokens)
 {
         assert_ptr(tokens);
 
-        if (tokens->size >= tokens->capacity - 50) {
+        if (tokens->size >= tokens->capacity / 2) {
                 token_arg_t *new_tokens = (token_arg_t*) realloc(tokens->tok_args, tokens->capacity * 2);
-                if (new_tokens)
+                if (new_tokens) {
                         tokens->tok_args = new_tokens;
-                tokens->capacity = tokens->capacity * 2;
+                        tokens->capacity = tokens->capacity * 2;
+                }
                 return RESIZED;
         } else if (tokens->size >= tokens->capacity * 4) {
                 token_arg_t *new_tokens = (token_arg_t*) realloc(tokens->tok_args, tokens->capacity / 2);
-                tokens->capacity = tokens->capacity / 2;
-                if (new_tokens)
+                if (new_tokens) {
+                        $
                         tokens->tok_args = new_tokens;
+                        tokens->capacity = tokens->capacity / 2;
+                }
                 return RESIZED;
         }
 
@@ -120,7 +123,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
 #define ass_type(type_arg) token->type = type_arg
 #define contin ++*ip
 
-int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert errors
+int get_arg (token_arg_t *token, char *buf, size_t *ip)
 {
         assert_ptr(token);
         assert_ptr(buf);
@@ -128,7 +131,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
 
         if (isalpha(buf[*ip])) {
                 get_word(token, buf, ip);
-                #include "..\include\key_words.kw"
+#include "..\include\key_words.kw"
                 /*else*/
                         token->type = NAME;
                 log(3, "Got token with name: \"%s\" and type: \"%d\"", token->name, token->sub_type);
@@ -137,7 +140,7 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)           //add assert e
                 log(2, "DIGIT-TOKEN has type %d", token->type);
         } else {
                 switch (buf[*ip]) {
-                #include "..\include\symbles.sym"
+#include "..\include\symbles.sym"
                 default:
                         log(1, "here");
                         if (!get_relat_op(token, buf, ip)) {
