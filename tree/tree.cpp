@@ -21,9 +21,10 @@ node_t* tree_insert (const node_t *temp_node)
         assert(temp_node);
 
         node_t *node = (node_t*) calloc(1, sizeof(node_t));
-        if (!node)
+        if (!node) {
+                log_error(1, "Calloc returned NULL.");
                 return nullptr;
-
+        }
         node->atr      = temp_node->atr;
         node->data     = temp_node->data;
         node->type     = temp_node->type;

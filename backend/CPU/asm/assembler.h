@@ -28,7 +28,9 @@ void free_buf (char *buf);
 int pre_asm (code_t *code);
 int paste_new_part (line_t *lines, char *part1, char *part2, char *buf,
                     size_t *char_counter, size_t *lines_counter, int is_pop, char op);
+
 size_t count_op (code_t *code);
 char contain_op (char *str, size_t length);
+char contain_symb (char *str, size_t length, char symb);
 
 #endif /*ASM_H*/

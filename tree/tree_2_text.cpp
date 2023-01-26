@@ -16,7 +16,7 @@ int tree_2_text (tree_t *tree, const char* txt_file_name)
         return 0;
 }
 
-#define print(format_line, ... ) fprintf(text_tree, format_line __VA_OPT__(,) __VA_ARGS__)
+#define print(format_line, ...) fprintf(text_tree, format_line __VA_OPT__(,) __VA_ARGS__)
 
 int write_node (FILE *text_tree, node_t *node, int n_tabs)
 {
@@ -50,21 +50,21 @@ int write_node_data (FILE *text_tree, node_t *node)
 
         switch (node->type) {
         case STAFF:
-                print("%d %d %d", node->type, node->sub_type, node->right ? 1 : 0);
+                print("%d %d", node->type, node->sub_type);
                 break;
         case FUNC:
         case NAME:
-                print("%d %s %d", node->type, node->name, node->right ? 1 : 0);
+                print("%d %s", node->type, node->name);
                 break;
         case FUNC_INIT:
         case VARIABLE:
-                print("%d %d %s %d", node->type, node->sub_type, node->name, node->right ? 1 : 0);
+                print("%d %d %s", node->type, node->sub_type, node->name);
                 break;
         case ASSIGNMENT:
-                print("%d %d", node->type, node->right ? 1 : 0);
+                print("%d", node->type);
                 break;
         case NUMBER:
-                print("%d %d %d %d", node->type, node->sub_type, node->data, node->right ? 1 : 0);
+                print("%d %d %d", node->type, node->sub_type, node->data);
                 break;
         case ADD_OPERATOR:
         case SUB_OPERATOR:
@@ -75,16 +75,18 @@ int write_node_data (FILE *text_tree, node_t *node)
         case AND:
         case OR:
         case OPERATOR:
-                print("%d %d %d", node->type, node->sub_type, node->right ? 1 : 0);
+                print("%d %d", node->type, node->sub_type);
                 break;
         case NEXT_ELEM:
         case END_LINE:
-                print("%d %d", node->type, node->right ? 1 : 0);
+                print("%d", node->type);
                 break;
         default:
                 log(2, "Default switch case in texting tree(%s)", node->name);
                 return UNKNOWN_TYPE;
         }
+
+        print(" %d %d", node->left ? 1 : 0, node->right ? 1 : 0);
 
         return 0;
 }
@@ -115,22 +117,31 @@ int text_2_tree (tree_t *tree)
         node_t temp_node = {};
         size_t counter   =  1;
         int has_right    =  0;
+        int has_left     =  0;
 
         read_node_data(text.buf, &counter, &temp_node);
         tree->root = tree_insert(&temp_node);
+
         if (text.buf[counter] == '1') {
-                ++has_right;
+                has_left = 1;
+                counter += 2;
+        } else if (text.buf[counter] == '0') {
+                counter += 2;
+        }
+
+        if (text.buf[counter] == '1') {
+                has_right = 1;
                 ++counter;
         } else if (text.buf[counter] == '0') {
                 ++counter;
         }
 
-        read_node(text.buf, &counter, tree->root, has_right);
+        read_node(text.buf, &counter, tree->root, has_left, has_right);
 
         return 0;
 }
 
-int read_node (char *buf, size_t *counter, node_t *node, int prev_has_right)
+int read_node (char *buf, size_t *counter, node_t *node, int prev_has_left, int prev_has_right)
 {
         assert_ptr(buf);
         assert_ptr(counter);
@@ -138,20 +149,33 @@ int read_node (char *buf, size_t *counter, node_t *node, int prev_has_right)
 
         node_t temp_node = {};
         int has_right = 0;
+        int has_left  = 0;
 
         skip
 
         if (buf[*counter] == '{') {
                 ++*counter;
                 read_node_data(buf, counter, &temp_node);
-                node->left = tree_insert(&temp_node);
+
+                if (prev_has_left)
+                        node->left  = tree_insert(&temp_node);
+                else
+                        node->right = tree_insert(&temp_node);
+
+                if (buf[*counter] == '1') {
+                        has_left = 1;
+                        *counter += 2;
+                } else if (buf[*counter] == '0') {
+                        *counter += 2;
+                }
                 if (buf[*counter] == '1') {
                         has_right = 1;
                         ++*counter;
                 } else if (buf[*counter] == '0') {
                         ++*counter;
                 }
-                read_node(buf, counter, node->left, has_right);
+
+                read_node(buf, counter, node->left ? node->left: node->right, has_left, has_right);
 
                 skip
 
@@ -162,12 +186,18 @@ int read_node (char *buf, size_t *counter, node_t *node, int prev_has_right)
 
                 skip
 
-                if (prev_has_right) {
+                if (prev_has_right && prev_has_left) {
                         if (buf[*counter] == '{')
                                 ++*counter;
                         read_node_data(buf, counter, &temp_node);
                         node->right = tree_insert(&temp_node);
-
+                        skip
+                        if (buf[*counter] == '1') {
+                                has_left = 1;
+                                *counter += 2;
+                        } else if (buf[*counter] == '0') {
+                                *counter += 2;
+                        }
                         if (buf[*counter] == '1') {
                                 has_right = 1;
                                 ++*counter;
@@ -175,7 +205,7 @@ int read_node (char *buf, size_t *counter, node_t *node, int prev_has_right)
                                 ++*counter;
                                 has_right = 0;
                         }
-                        read_node(buf, counter, node->right, has_right);
+                        read_node(buf, counter, node->right, has_left, has_right);
 
                         if (buf[*counter] == '}')
                                 ++*counter;

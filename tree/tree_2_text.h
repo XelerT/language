@@ -10,7 +10,7 @@ int tree_2_text            (tree_t *tree, const char* txt_file_name);
 void print_tabs            (FILE *text_tree, int n_tabs);
 
 int text_2_tree            (tree_t *tree);
-int read_node              (char *buf, size_t *counter, node_t *node, int prev_has_right);
+int read_node              (char *buf, size_t *counter, node_t *node, int prev_has_left, int prev_has_right);
 char read_node_data        (char *buf, size_t *counter, node_t *node);
 int read_name              (char *dest, char *src, size_t *counter);
 int read_number            (char *buf, size_t *counter);

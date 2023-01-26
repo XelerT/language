@@ -1,2 +1,3 @@
 CMD(PRINT, 999, "out\n")
-CMD(SCAN, 998, "in\n")
+CMD(SCAN,  998, "in\n")
+CMD(SQRT,  997, "sqrt\n")

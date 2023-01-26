@@ -22,14 +22,14 @@ int log_init (const char *log_file_name)
         return 0;
 }
 
-int mlog (const char *str, const char *file, int line)
+int mlog (const char *str, const char *file, int line, const char *color, int font_size)
 {
         assert_ptr(str);
         assert_ptr(LOG_FILE);
         assert_ptr(file);
 
         fprintf(LOG_FILE, "<span style = \"color: gray; font-size:14px;\">{File: %s, Line: %d}"
-        " <span style = \"color: black; font-size:14px;\">\t%s.</span></span>\n", file, line, str );
+        " <span style = \"color: %s; font-size:%dpx;\">\t%s.</span></span>\n", file, line, color, font_size, str);
 
         return 0;
 }
@@ -46,7 +46,7 @@ int log_pict (const char *str, const char *file, int line)
         return 0;
 }
 
-int massert (const void *ptr, const char *var, const char *file, int line)
+int my_assert (const void *ptr, const char *var, const char *file, int line)
 {
         if (ptr == nullptr && LOG_FILE != nullptr) {
                 fprintf(LOG_FILE, "<p style = \"color: red; font-size:20px;\"> Variable \"%s\""

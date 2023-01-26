@@ -42,7 +42,6 @@ int resize_tokens (tokens_t *tokens)
         } else if (tokens->size >= tokens->capacity * 4) {
                 token_arg_t *new_tokens = (token_arg_t*) realloc(tokens->tok_args, tokens->capacity / 2);
                 if (new_tokens) {
-                        $
                         tokens->tok_args = new_tokens;
                         tokens->capacity = tokens->capacity / 2;
                 }
@@ -79,7 +78,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
         token_arg_t  temp_token = {};
 
         for (size_t ip = 0, i = 0; ip < text.n_chars; i++) {
-                if (get_arg(tokens->tok_args + i, text.buf, &ip)) {
+                if (get_arg(tokens, text.buf, &ip, i)) {
                         resize_tokens(tokens);
                         tokens->tok_args[i].atr = temp_token.atr;
                         tokens->size += 1;
@@ -123,11 +122,13 @@ int get_tokens (tokens_t *tokens, const char *file_name)
 #define ass_type(type_arg) token->type = type_arg
 #define contin ++*ip
 
-int get_arg (token_arg_t *token, char *buf, size_t *ip)
+int get_arg (tokens_t *tokens, char *buf, size_t *ip, size_t tp)
 {
-        assert_ptr(token);
+        assert_ptr(tokens);
         assert_ptr(buf);
         assert_ptr(ip);
+
+        token_arg_t *token = tokens->tok_args + tp;
 
         if (isalpha(buf[*ip])) {
                 get_word(token, buf, ip);
@@ -135,7 +136,8 @@ int get_arg (token_arg_t *token, char *buf, size_t *ip)
                 /*else*/
                         token->type = NAME;
                 log(3, "Got token with name: \"%s\" and type: \"%d\"", token->name, token->sub_type);
-        } else if (isdigit(buf[*ip])) {
+        } else if (isdigit(buf[*ip]) || (buf[*ip] == '-' && isdigit(buf[*ip + 1]) && tokens->tok_args[tp - 1].type != NUMBER &&
+                                         tokens->tok_args[tp - 1].type != NAME && tokens->tok_args[tp - 1].type != CL_BRACKET)) {
                 get_number(token, buf, ip);
                 log(2, "DIGIT-TOKEN has type %d", token->type);
         } else {
@@ -170,7 +172,13 @@ int get_number(token_arg_t *token, char *buf, size_t *ip)
 
         elem_t val = 0;
         char float_counter = -1;
+        elem_t minus = 0;
         token->sub_type = INT;
+
+        if (buf[*ip] == '-') {
+                ++*ip;
+                minus = -1;
+        }
 
         for (int i = 0; (isdigit(buf[*ip]) || buf[*ip] == '.') && float_counter != 2; i++) {
                 if (buf[*ip] == '.') {
@@ -182,6 +190,10 @@ int get_number(token_arg_t *token, char *buf, size_t *ip)
                 }
                 val = val * 10 + (buf[*ip] - '0');
                 ++*ip;
+        }
+
+        if (minus) {
+                val *= minus;
         }
 
         token->val = val;

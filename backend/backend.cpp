@@ -106,7 +106,7 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
                 case EGREATER:
                         rel_op(jae, egreater, table->gl_table->rel_op_size)
                 default:
-                        log(1, "<span style = \"color: red; font-size:16px;\">UNKOWN RELATIVE OPERATOR</span>");
+                        log_error(1, "UNKOWN RELATIVE OPERATOR");
                 }
                 table->gl_table->rel_op_size++;
                 break;
@@ -205,7 +205,7 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
                 log(1, "div");
                 break;
         default:
-                log(2, "Default switch case in assembling(%s)", node->name);
+                log(2, "Default switch case in assembling(%s, type:%lld)", node->name, node->type);
         }
         return 0;
 }
@@ -266,7 +266,7 @@ int var_init (table_t *gl_table, table_t *loc_table, int sub_type, char *name)
 
         for (size_t i = 0; i < gl_table->var_size; i++) {
                 if (!strcmp(name, gl_table->vars[i].name)) {
-                        log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s already initialized as global variable!</span>", name);
+                        log_error(2, "!Variable %s already initialized as global variable!", name);
                         return INIT_ERROR;
                 }
                 if (resize_table(gl_table))
@@ -276,7 +276,7 @@ int var_init (table_t *gl_table, table_t *loc_table, int sub_type, char *name)
         if (loc_table) {
                 for (size_t i = 0; i < loc_table->var_size; i++) {
                         if (!strcmp(name, loc_table->vars[i].name)) {
-                                log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s already initialized as local variable!</span>", name);
+                                log_error(2, "!Variable %s already initialized as local variable!", name);
                                 return INIT_ERROR;
                         }
                 }
@@ -460,7 +460,7 @@ int func_init (FILE *output, node_t *node, tab_table_t *table)
 
         for (size_t i = 0; i < gl_table->func_size; i++) {
                 if (!strcmp(node->name, gl_table->funcs[i].name)) {
-                        log(2, "<span style = \"color: red; font-size:16px;\">!Function %s already initialized!</span>", node->name);
+                        log_error(2, "!Function %s already initialized!", node->name);
                         return INIT_ERROR;
                 }
         }
@@ -502,25 +502,36 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
                 if (resize_tab_table(table))
                         return REALLOC_ERR;
                 table->loc_tables[table->loc_size++] = &loc_table;
-                loc_table.var_size = count_args(node->left);
+                if (node->left)
+                        loc_table.var_size = count_args(node->left);
         }
 
-        asm_node(node->left, table, output);
-
+        if (node->left) {
+                log(1, "here");
+                asm_node(node->left, table, output);
+        }
 
         if (loc_table.var_cap && !is_main)
                 indent_rbx(output, n_args);
 
-        for (size_t i = loc_table.var_size - 1; i > 0 && !is_main; i--) {
-                if (loc_table.vars[i].type == INT)
-                        fprintf(output, "pop [rbx + %lld]\n", i);
-                else if (loc_table.vars[i].type == FLOAT)
-                        fprintf(output, "popf [rbx + %lld]\n", i);
+        if (loc_table.var_size != 0) {
+                for (size_t i = loc_table.var_size - 1; i > 0 && !is_main; i--) {
+                        if (loc_table.vars[i].type == INT)
+                                fprintf(output, "pop [rbx + %lld]\n", i);
+                        else if (loc_table.vars[i].type == FLOAT)
+                                fprintf(output, "popf [rbx + %lld]\n", i);
 
-                log(2, "Add argument with \"%s\" name", loc_table.vars[i].name);
+                        log(2, "Add argument with \"%s\" name", loc_table.vars[i].name);
+                }
         }
+        loc_table.var_size = n_args - loc_table.var_size;
 
-        asm_node(node->right, table, output);
+        log(3, "here %s %lld", node->name, node->right->type);
+
+        if (node->right)
+                asm_node(node->right, table, output);
+        else
+                log(1, "NULLPTR");
 
         if (!gl_table->funcs[gl_table->func_size].has_return && !is_main) {
                 asm_return(output, table);
@@ -531,8 +542,6 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
         }
 
         log(2, "Assmed \"%s\" function", node->name);
-        table_dtor(&loc_table);
-        table->loc_tables[table->loc_size--] = nullptr;
 
         return 0;
 }
@@ -557,7 +566,7 @@ int asm_name (FILE *output, tab_table_t *table, node_t *node)
                 in_loc_table = 1;
         }
         if (indent == SIZE_T_ERROR) {
-                log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s was not initialized!</span>", node->name);
+                log_error(2, "!Variable %s was not initialized!", node->name);
                 return INIT_ERROR;
         }
 
@@ -644,7 +653,7 @@ int resize_table (table_t *table)
                 if (temp) {
                         table->vars = temp;
                 } else {
-                        log(1, "<span style = \"color: red; font-size:16px;\">!Realloc returned null!</span>");
+                        log_error(1, "!Realloc returned null!");
                         return REALLOC_ERR;
                 }
                 log(1, "<span style = \"color: green; font-size:10px;\">Resized var_table</span>");
@@ -656,7 +665,7 @@ int resize_table (table_t *table)
                 if (temp2 || table->func_cap == 0) {
                         table->funcs = temp2;
                 } else {
-                        log(1, "<span style = \"color: red; font-size:16px;\">!Realloc returned null!</span>");
+                        log_error(1, "!Realloc returned null!");
                         return REALLOC_ERR;
                 }
                 log(1, "<span style = \"color: green; font-size:10px;\">Resized func_table</span>");
@@ -811,7 +820,7 @@ int asm_assignment (FILE *output, node_t *node, tab_table_t *table)
                 }
         }
         if (indent == SIZE_T_ERROR) {
-                log(2, "<span style = \"color: red; font-size:16px;\">!Variable %s was not initialized!</span>", node->left->name);
+                log_error(2, "!Variable %s was not initialized!", node->left->name);
                 return INIT_ERROR;
         }
 
@@ -881,7 +890,7 @@ int resize_tab_table (tab_table_t *table)
                         table->loc_tables = temp_loc_tables;
                         table->loc_cap  *= 2;
                 } else {
-                        log(1, "<span style = \"color: red; font-size:16px;\">!Realloc returned null!</span>");
+                        log_error(1, "!Realloc returned null!");
                         return REALLOC_ERR;
                 }
                 log(1, "<span style = \"color: green; font-size:10px;\">Resized loc_tables</span>");
@@ -921,7 +930,7 @@ int asm_scan (FILE *output, node_t *node, tab_table_t *table)
         fprintf(output, "in\n");
 
         if (node->type == NUMBER) {
-                log(1, "<span style = \"color: red; font-size:18px;\"> Tried to scan in number </span>");
+                log_error(1, "Tried to scan in number");
                 return LEX_ERROR;
         } else if (node->type == NAME) {
                 size_t indent = find_var(table->gl_table, node->name);
@@ -953,6 +962,9 @@ int asm_staff (FILE *output, node_t *node, tab_table_t *table)
         } else if (node->sub_type == PRINT) {
                 asm_node(node->left, table, output);
                 fprintf(output, "out\n");
+        } else if (node->sub_type == SQRT) {
+                asm_node(node->left, table, output);
+                fprintf(output, "sqrt\n");
         }
 
         return 0;

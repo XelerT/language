@@ -8,6 +8,7 @@
 #include "..\include\lexer.h"
 #include "..\include\config.h"
 #include "token_tree.h"
+#include "errors_handler.h"
 
 #define arg tokens->tok_args
 
@@ -222,15 +223,15 @@ node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tp);
         assert_ptr(tree);
 
-        node_t *l_node = get_p(tokens, tp, tree);
-        node_t *node   = nullptr;
+        node_t *l_node   = get_p(tokens, tp, tree);
+        node_t *node     = nullptr;
         node_t temp_node = {};
 
         if (arg[*tp].type == AND || arg[*tp].type == OR) {
                 log(2, "Created node with conjanction %s", arg[*tp].name);
                 edit_temp(&temp_node, arg + *tp);
                 ++*tp;
-                node        = tree_insert(&temp_node);
+                node = tree_insert(&temp_node);
                 node->left  = l_node;
                 node->right = get_p(tokens, tp, tree);
                 node->atr.fillcolor = "#98B1B5";
@@ -256,11 +257,12 @@ node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree)
                               temp_node.sub_type = ESMALLER;
                         break;
                 default:
-                        log(1, "<span style = \"color: red; font-size:16px;\">!Unknown relative operator!</span>");
+                        log_error(1, "!Unknown relative operator!");
                 }
                 ++*tp;
                 node        = tree_insert(&temp_node);
                 node->left  = l_node;
+
                 node->right = get_p(tokens, tp, tree);
                 node->atr.fillcolor = "#98B1B5";
         }
@@ -282,6 +284,8 @@ node_t* get_p (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 ++*tp;
                 node = get_e(tokens, tp, tree);
                 log(2, "Type in e: %d", arg[*tp].type);
+
+                check_symb(tokens, tp, ')');
                 assert(arg[*tp].type == CL_BRACKET);
                 ++*tp;
         } else {
@@ -306,6 +310,9 @@ node_t* get_ne (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 edit_temp(&temp_node, arg + *tp);
                 ++*tp;
                 node = tree_insert(&temp_node);
+
+                if (check_arg(tokens, tp))
+                        return nullptr;
                 node->right = get_e(tokens, tp, tree);
                 log(2, "In NEXT_ELEM after E: %d", arg[*tp].type);
                 node->left = l_node;
@@ -332,6 +339,7 @@ node_t* get_a (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 token_arg_t token = {};
                 copy_token(&token, arg + *tp);
                 ++*tp;
+
                 node_t *r_node = get_e(tokens, tp, tree);
 
                 edit_temp(&temp_node, &token);
@@ -362,6 +370,8 @@ node_t* get_cb (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 log(2, "Type after { %d", arg[*tp].type);
                 node = get_el(tokens, tp, tree);
                 log(3, "Type in cb: %d name: %s", arg[*tp].type, arg[*tp].name);
+
+                check_symb(tokens, tp, '}');
                 assert(arg[*tp].type == CL_C_BRACKET);
                 ++*tp;
         } else {
@@ -387,10 +397,11 @@ node_t* get_func (const tokens_t *tokens, size_t *tp, tree_t *tree)
                         strcpy(temp_node.name, arg[*tp + 1].name);
                         temp_node.type = FUNC_INIT;
                         *tp += 2;
-                        log(3, "Created function with type: \"%d\", name: \"%s\"", temp_node.sub_type, temp_node.name);
                         temp_node.atr.fillcolor = "#EB8CD5";
-
                         node = tree_insert(&temp_node);
+                        log(3, "Created function with type: \"%d\", name: \"%s\"", temp_node.sub_type, temp_node.name);
+
+
                         if (arg[*tp + 1].type != CL_BRACKET)
                                 node->left  = get_p(tokens, tp, tree);
                         else
@@ -406,7 +417,10 @@ node_t* get_func (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 temp_node.atr.fillcolor = "#D681C2";
 
                 node        = tree_insert(&temp_node);
-                node->left  = get_p (tokens, tp, tree);
+                if (arg[*tp + 1].type != CL_BRACKET)
+                                node->left  = get_p(tokens, tp, tree);
+                        else
+                                *tp += 2;
         } else {
                 node        = get_n(tokens, tp, tree);
         }
@@ -456,7 +470,7 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                                 log(3, "Created variable with type: \"%d\", name: \"%s\"", node.sub_type, node.name);
                                 node.atr.fillcolor = "#93F558";
                         } else {
-                                log(1, "<span style = \"color: red; font-size:16px;\">!No variable name after data type!</span>");
+                                log_error(1, "!No variable name after data type!");
                                 recycle = 0;
                         }
                         break;
@@ -471,6 +485,9 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                                 log(1, "Unknown standart command");
                         }
                         ++*tp;
+                        if (check_arg(tokens, tp))
+                                return nullptr;
+
                         node.left = get_e(tokens, tp, tree);
                         break;
                 default:

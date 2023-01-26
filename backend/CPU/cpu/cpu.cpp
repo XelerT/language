@@ -18,7 +18,7 @@
                                         if (code->cmds[ip] & ARG_IMMED) {                                               \
                                                 stack_push(stk, cpu->RAM[code->cmds[++ip]]);                            \
                                         }                                                                               \
-                                } else  if (code->cmds[ip] & ARG_IMMED) {                                               \
+                                } else if (code->cmds[ip] & ARG_IMMED) {                                                \
                                         stack_push(stk, code->cmds[++ip]);                                              \
                                 }                                                                                       \
                         } else if ((code->cmds[ip] & MASK_CMD) == CMD_POP) {                                            \

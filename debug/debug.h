@@ -10,7 +10,7 @@
 
 #define $c(arg) fprintf(stderr, "Var: \"%s\", Char: %c, File: %s, Line: %d\n", #arg, arg, __FILE__, __LINE__);
 
-#define $s(arg) fprintf(stderr, "String: %s, File: %s, Line: %d\n", arg, __FILE__, __LINE__);
+#define $s(arg) fprintf(stderr, "String in File: %s, Line: %d\n%s\n", __FILE__, __LINE__, arg);
 
 #define $d(arg) fprintf(stderr, "Decimal %s: %d, File: %s, Line: %d\n", #arg, arg, __FILE__, __LINE__);
 #define $lld(arg) fprintf(stderr, "Var: \"%s\", Size_t: %lld, File: %s, Line: %d\n", #arg, arg, __FILE__, __LINE__);

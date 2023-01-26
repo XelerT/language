@@ -51,7 +51,8 @@ int pre_asm (code_t *code)
         char op = 0;
 
         for (size_t i = 0; i < code->n_lines; i++) {
-                if ((op = contain_op(code->lines[i].ptr, code->lines[i].length))) {
+                op = contain_op(code->lines[i].ptr, code->lines[i].length);
+                if (op && contain_symb(code->lines[i].ptr, code->lines[i].length, '[')) {
                         int is_pop  = !strncmp(code->lines[i].ptr, "pop [", 5);
                         int is_push = !strncmp(code->lines[i].ptr, "push [", 6);
                         if (is_pop == is_push) {
@@ -151,16 +152,34 @@ size_t count_op (code_t *code)
         return count;
 }
 
-char contain_op (char *str, size_t length)
+char contain_symb (char *str, size_t length, char symb)
 {
         assert(str);
 
         for (size_t i = length - 1; i; i--) {
-                if (str[i] == '+' || str[i] == '-' || str[i] == '*')
+                if (str[i] == symb) {
                         return str[i];
+                }
         }
 
         return 0;
+}
+
+char contain_op (char *str, size_t length)
+{
+        assert(str);
+
+        char symb = contain_symb(str, length, '*');
+        if (symb)
+                return symb;
+
+        symb = contain_symb(str, length, '+');
+        if (symb)
+                return symb;
+
+        symb = contain_symb(str, length, '-');
+
+        return symb;
 }
 
 int convert_code (code_t *code, FILE *output_code, int second_cycle, labels_t *labels, int *asm_code)
@@ -256,8 +275,9 @@ int get_pp_code (const char *val, int *asm_code, const char *cmd, int coeff)
                         // printf("dotnum %f\n", dot_num);
                                 *asm_code = (int) (dot_num * (float) coeff);
                                 num |= ARG_IMMED;
-                        } else if (sscanf(val, "%d", asm_code))
+                        } else if (sscanf(val, "%d", asm_code)) {
                                 num = ARG_IMMED;
+                        }
                 }
         }
 
@@ -355,7 +375,6 @@ int get_jmp_line (labels_t *labels, char *name)
                         return labels[i].line;
                 }
         }
-
         return NO_LABEL;
 }
 
