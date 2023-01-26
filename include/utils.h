@@ -28,9 +28,11 @@ struct digraph_t {
 };
 
 enum main_errors {
-        ALLOC_ERR   = 0xBADA110C,
-        REALLOC_ERR = 0xBADA110C,
-        LEX_ERROR   = 0xBAD1E4
+        ALLOC_ERR    = 0xBADA110C,
+        REALLOC_ERR  = 0xBADA110C,
+        LEX_ERROR    = 0xBAD1E4,
+        NULL_SPRINTF = 0xBAD366,
+        TOO_LONG     = 0x100104
 };
 
 #endif /*UTILS_H*/

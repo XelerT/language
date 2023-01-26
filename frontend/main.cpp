@@ -45,7 +45,7 @@ int main (int argc, char *argv[])
         // tree_graph(&tree, "output_utils\\tree_graph.dot", "front_tree.png");
         // system("make graph_tree IMG_PATH=output_utils\\front_tree.png");
 
-        execution_status = tree_2_text(&tree, "tree.txt");
+        execution_status = tree_2_text(&tree, "tree.dreva");
         if (execution_status)
                 return execution_status;
 

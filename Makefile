@@ -68,7 +68,7 @@ all:
 	@ g++ -o $(FRONT_OUTPUT) $(CFLAGS) $(FRONT_CFILES)
 	@ g++ -o $(ASM_OUTPUT)   $(CFLAGS) $(ASM_CFILES)
 	@ g++ -o $(CPU_OUTPUT)   $(CFLAGS) $(CPU_CFILES)
-	@ g++ -o $(DRIVE_OUTPUT) $(CFLAGS) drive.cpp
+	@ g++ -o $(DRIVE_OUTPUT) $(CFLAGS) drive.cpp UI.cpp log\log.cpp
 	@ echo Compiled c-files
 def:
 	@ g++ -E $(OUTPUT) $(CFLAGS) $(CFILES) >> defines.txt

@@ -13,10 +13,7 @@ int check_argv (int argc, char **argv)
                 printf ("You need to enter 3 arguments.\n");
         if (argv[2] == 0)
                 printf("Enter name of the file with source code.\n");
-        else if (strstr(argv[2], ".txt") == nullptr) {
-                printf("Cannot find .txt file with source code.\n");
-                return NO_SOURCE;
-        }
+
         if (argv[1] == 0) {
                 printf("You need to enter name of the output file.\n");
                 return NO_OUTPUT_NAME;

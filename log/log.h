@@ -32,7 +32,7 @@ int    log_init (const char *log_file_name);
 int        mlog (const char *str, const char *file, int line, const char *color, int font_size);
 int    log_pict (const char *str, const char *file, int line);
 char* make_line (int argc, ...);
-void fill_null  (char *str);
-int   log_dtor  ();
+void  fill_null (char *str);
+int    log_dtor ();
 
 #endif /*LOG_H*/

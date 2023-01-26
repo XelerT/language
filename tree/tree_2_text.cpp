@@ -108,10 +108,10 @@ int text_2_tree (tree_t *tree)
 {
         assert_ptr(tree);
 
-        FILE *text_tree = fopen("tree.txt", "r");
+        FILE *text_tree = fopen("tree.dreva", "r");
         text_t text = {};
 
-        get_text(text_tree, &text, "tree.txt");
+        get_text(text_tree, &text, "tree.dreva");
         fclose(text_tree);
 
         node_t temp_node = {};
