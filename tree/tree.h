@@ -18,11 +18,6 @@ enum tree_errors {
         NULL_NODE_PTR = 4
 };
 
-enum errors {
-        NULL_CALLOC   = -1,
-        NULL_FILE_PTR = -2
-};
-
 struct node_t {
         node_t *left               = nullptr;
         node_t *right              = nullptr;

@@ -41,7 +41,6 @@ enum errors {
         NO_REGISTER    = -7,
         DIVIDE_ERR     = -6, //
         NO_LABEL       = -5, // 0x Hex speak
-        NULL_CALLOC    = -4, // 0xBADALL0C
         EXECUTE_ERR    = -3,
         NO_SOURCE      = -2,
         NO_OUTPUT_NAME = -1

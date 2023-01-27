@@ -1,8 +1,10 @@
-BACK_CFILES = backend\main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp \
-	 frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp backend\backend.cpp tree\tree_2_text.cpp tree\errors_handler.cpp
+BACK_CFILES = backend\main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp         \
+	      frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp backend\backend.cpp     \
+	      tree\tree_2_text.cpp tree\errors_handler.cpp backend\tables.cpp
 
-FRONT_CFILES = frontend\main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp \
-	 frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp backend\backend.cpp tree\tree_2_text.cpp tree\errors_handler.cpp
+FRONT_CFILES = frontend\main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp       \
+	       frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp 		       \
+	       tree\tree_2_text.cpp tree\errors_handler.cpp
 
 ASM_CFILES = backend\CPU\buffer.cpp backend\CPU\asm\main.cpp backend\CPU\asm\assembler.cpp
 ASM_OUTPUT = asm.exe
@@ -13,8 +15,8 @@ CPU_OUTPUT = cpu.exe
 DIS_ASM_CFILES = backend\CPU\buffer.cpp backend\CPU\dis_asm\main.cpp backend\CPU\dis_asm\dis_asm.cpp
 DIS_ASM_OUTPUT = dis_asm.exe
 
-IMG_FORMAT = png
-DOT_FILE_NAME = output_utils\tokens_graph.dot
+IMG_FORMAT      = png
+DOT_FILE_NAME   = output_utils\tokens_graph.dot
 UTILS_DIRECTORY = output_utils
 
 BACK_OUTPUT  = back.exe
