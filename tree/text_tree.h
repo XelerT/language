@@ -36,7 +36,7 @@ int tree2text (node_t *node, FILE *output, int n_tabs);
 
 // node_t* get_g (const char *str, size_t *char_count, tree_t *tree);
 // node_t* get_div_mul (const char *str, size_t *char_count, tree_t *tree);
-// node_t* get_t (const char *str, size_t *char_count, tree_t *tree);
+// node_t* get_sub_add(const char *str, size_t *char_count, tree_t *tree);
 // node_t* get_d (const char *str, size_t *char_count, tree_t *tree);
 // node_t* get_brackets(const char *str, size_t *char_count, tree_t *tree);
 // node_t* get_f (const char *str, size_t *char_count, tree_t *tree);

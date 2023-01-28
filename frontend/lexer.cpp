@@ -75,13 +75,19 @@ int get_tokens (tokens_t *tokens, const char *file_name)
                 return NULL_FILE;
         }
         get_text(input, &text, file_name);
+        tokens->inputed_text = text.buf;
         token_arg_t  temp_token = {};
 
-        for (size_t ip = 0, i = 0; ip < text.n_chars; i++) {
-                if (get_arg(tokens, text.buf, &ip, i)) {
+        size_t n_line      = 1;
+        size_t ip          = 0;
+        for (size_t i = 0; ip < text.n_chars; i++) {
+                tokens->tok_args[i].n_char = ip;
+                if (get_arg(tokens, text.buf, &ip, i, &n_line)) {
                         resize_tokens(tokens);
                         tokens->tok_args[i].atr = temp_token.atr;
+                        tokens->tok_args[i].n_line = n_line;
                         tokens->size += 1;
+
                         log(2, "Number of tokens: %lld", tokens->size);
                         log(4, "token(%lld) is \"%s\", type: %d", i, tokens->tok_args[i].name, tokens->tok_args[i].type);
                 } else {
@@ -107,22 +113,23 @@ int get_tokens (tokens_t *tokens, const char *file_name)
                                                 token->sub_type = num;                          \
                                         } else
 
-#define SYMB(key,arg,num,type_arg,is,code)  case arg:                                                       \
+#define SYMB(key,arg,num,type_arg,is,code)  case arg:                                                      \
                                                 if (key) {                                                 \
                                                         if (is)                                            \
                                                                 code                                       \
                                                         contin;                                            \
                                                 } else {                                                   \
-                                                        get_punct(token, buf, ip);                         \
+                                                        get_punct(token, buf, ip, n_line);                 \
                                                 }                                                          \
-                                                log(2, "*****%lld****", type_arg);     \
+                                                log(2, "*****%lld****", type_arg);                         \
                                                 break;
 
 #define assign(num) token->name[num] = buf[*ip]
 #define ass_type(type_arg) token->type = type_arg
 #define contin ++*ip
+#define new_line_counter ++*n_line
 
-int get_arg (tokens_t *tokens, char *buf, size_t *ip, size_t tp)
+int get_arg (tokens_t *tokens, char *buf, size_t *ip, size_t tp, size_t *n_line)
 {
         assert_ptr(tokens);
         assert_ptr(buf);
@@ -153,7 +160,7 @@ int get_arg (tokens_t *tokens, char *buf, size_t *ip, size_t tp)
                                         log(3, "ASSIGNMENT %d %s", token->type, token->name);
                                         return 1;
                                 }
-                                get_punct(token, buf, ip);
+                                get_punct(token, buf, ip, n_line);
                         }
                         ++*ip;
                         break;
@@ -255,7 +262,7 @@ int get_relat_op(token_arg_t *token, char *buf, size_t *ip)
                                                         }                                                             \
                                                         break;
 
-int get_punct (token_arg_t *token, char *buf, size_t *ip)
+int get_punct (token_arg_t *token, char *buf, size_t *ip, size_t *n_line)
 {
         assert_ptr(token);
         assert_ptr(buf);
@@ -274,3 +281,4 @@ int get_punct (token_arg_t *token, char *buf, size_t *ip)
 #undef ass_type
 #undef contin
 #undef SYMB
+#undef new_line_counter

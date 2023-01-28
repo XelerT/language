@@ -8,9 +8,12 @@
 #include "..\include\lexer.h"
 #include "..\include\config.h"
 #include "token_tree.h"
-#include "errors_handler.h"
+#include "..\include\errors_handler.h"
 
 #define arg tokens->tok_args
+
+#define check(node) if (!node)                  \
+                        return nullptr;
 
 node_t* get_g (const tokens_t *tokens, size_t *tp, tree_t *tree)
 {
@@ -20,6 +23,13 @@ node_t* get_g (const tokens_t *tokens, size_t *tp, tree_t *tree)
         log(1, "<span style = \"color: blue; font-size:30px;\">START GETTING TREE</span>");
 
         node_t *node = get_end_line(tokens, tp, tree);
+        if (!node) {
+                tree_dtor(tree);
+                return nullptr;
+        } else if (check_type(tokens, tp, END_FILE, "Unexpected symbol", 1)) {
+                tree_dtor(tree);
+                return nullptr;
+        }
 
         assert(arg[*tp].type == END_FILE);
         return node;
@@ -32,8 +42,10 @@ node_t* get_end_line(const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node = nullptr;
-        if (arg[*tp].type != END_LINE)
+        if (arg[*tp].type != END_LINE) {
                 l_node = hub(tokens, tp, tree);
+                check(l_node)
+        }
         node_t *node   = nullptr;
         node_t temp_node  = {};
         token_arg_t token = {
@@ -50,6 +62,7 @@ node_t* get_end_line(const tokens_t *tokens, size_t *tp, tree_t *tree)
                         ++*tp;
                 if (arg[*tp].type != END_FILE && arg[*tp].type != CL_C_BRACKET) {
                         r_node = get_end_line(tokens, tp, tree);
+                        check(r_node);
                         log(2, "Type after El2 %d", arg[*tp].type);
                 }
                 edit_temp(&temp_node, &token);
@@ -81,32 +94,36 @@ node_t* hub (const tokens_t *tokens, size_t *tp, tree_t *tree)
                         if (arg[*tp + 1].type == NAME) {
                                 if (arg[*tp + 2].type == OP_BRACKET) {
                                         node = get_func_init(tokens, tp, tree);
+                                        check(node);
                                 } else {
                                         node = get_div_mul(tokens, tp, tree);
+                                        check(node);
                                         log(1, "After e in hub");
                                 }
                         } else {
-                                //error
-                                log_error(1, "errrrrrorrrrrrrrrr");
+                                if (check_type(tokens, tp + 1, NAME, "No variable/function name after data type", 1))
+                                        return nullptr;
                         }
                 } else if (arg[*tp].type == NAME) {
                         if (arg[*tp + 1].type == OP_BRACKET) {
                                 node = get_func(tokens, tp, tree);
+                                check(node);
                         } else {
                                 node = get_div_mul(tokens, tp, tree);
+                                check(node);
                         }
                 } else if (arg[*tp].type == CYCLE) {
-                        if (arg[*tp].type == WHILE)
+                        if (arg[*tp].type == WHILE) {
                                 node = get_while(tokens, tp, tree);
-                        else
+                                check(node);
+                        } else
                                 log_error(1, "Unknown cycle");
                 } else if (arg[*tp].type == OPERATOR && arg[*tp].sub_type == IF) {
-                        log(1, "IN HUB BEFORE IF");
                         node = get_if(tokens, tp, tree);
-                        log(1, "IN HUB AFTER IF");
+                        check(node);
                 } else if (arg[*tp].type == STAFF) {
                         node = get_div_mul(tokens, tp, tree);
-                        log(1, "IN HUB AFTER STAFF");
+                        check(node);
                 } else {
                         log_error(1, "errrrrrorrrrrrrrrr");
                 }
@@ -114,13 +131,14 @@ node_t* hub (const tokens_t *tokens, size_t *tp, tree_t *tree)
         return node;
 }
 
-node_t* get_div_mul (const tokens_t *tokens, size_t *tp, tree_t *tree)                //get_mul_div
+node_t* get_div_mul (const tokens_t *tokens, size_t *tp, tree_t *tree)
 {
         assert_ptr(tokens);
         assert_ptr(tp);
         assert_ptr(tree);
 
-        node_t *l_node = get_t(tokens, tp, tree);
+        node_t *l_node = get_sub_add(tokens, tp, tree);
+        check(l_node);
         log(2, "Type after t %s", l_node->name);
 
         node_t *node   = nullptr;
@@ -131,6 +149,7 @@ node_t* get_div_mul (const tokens_t *tokens, size_t *tp, tree_t *tree)          
                 copy_token(&token, arg + *tp);
                 ++*tp;
                 node_t *r_node = get_div_mul(tokens, tp, tree);
+                check(r_node);
 
                 edit_temp(&temp_node, &token);
                 node = tree_insert(&temp_node);
@@ -145,13 +164,14 @@ node_t* get_div_mul (const tokens_t *tokens, size_t *tp, tree_t *tree)          
         return l_node;
 }
 
-node_t* get_t (const tokens_t *tokens, size_t *tp, tree_t *tree)
+node_t* get_sub_add(const tokens_t *tokens, size_t *tp, tree_t *tree)
 {
         assert_ptr(tokens);
         assert_ptr(tp);
         assert_ptr(tree);
 
         node_t *l_node = get_conj(tokens, tp, tree);
+        check(l_node);
         log(2, "Type after If %s", l_node->name);
         node_t *node   = nullptr;
         if (arg[*tp].type == MUL_OPERATOR || arg[*tp].type == DIV_OPERATOR) {
@@ -159,7 +179,8 @@ node_t* get_t (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 token_arg_t token = {};
                 copy_token(&token, arg + *tp);
                 ++*tp;
-                node_t *r_node = get_t(tokens, tp, tree);
+                node_t *r_node = get_sub_add(tokens, tp, tree);
+                check(r_node);
 
                 edit_temp(&temp_node, &token);
                 node = tree_insert(&temp_node);
@@ -187,16 +208,19 @@ node_t* get_if (const tokens_t *tokens, size_t *tp, tree_t *tree)
         node_t *if_node = tree_insert(&temp_node);
         ++*tp;
         l_node = get_brackets(tokens, tp, tree);
+        check(l_node);
         log(3, "Token type in if: %d %s", arg[*tp].type, arg[*tp].name);
         node_t *r_node = get_brackets(tokens, tp, tree);
+        check(r_node);
 
         if (arg[*tp].type == OPERATOR && arg[*tp].sub_type == ELSE) {
                 if_node->right = get_else(tokens, tp, tree);
+                check(if_node->right);
                 if_node->right->left = r_node;
         } else {
                 if_node->right = r_node;
         }
-        if_node->left =  l_node;
+        if_node->left = l_node;
         if_node->atr.fillcolor = "#18D5F5";
 
         log(2, "Type after If %d", arg[*tp].type);
@@ -219,6 +243,7 @@ node_t* get_else (const tokens_t *tokens, size_t *tp, tree_t *tree)
         ++*tp;
         else_node = tree_insert(&temp_node);
         else_node->right = get_brackets(tokens, tp, tree);
+        check(else_node->right)
         else_node->atr.fillcolor = "#F51E2A";
 
         if (else_node)
@@ -226,7 +251,7 @@ node_t* get_else (const tokens_t *tokens, size_t *tp, tree_t *tree)
         return l_node;
 }
 
-node_t* get_while (const tokens_t *tokens, size_t *tp, tree_t *tree)               //while
+node_t* get_while (const tokens_t *tokens, size_t *tp, tree_t *tree)
 {
         assert_ptr(tokens);
         assert_ptr(tp);
@@ -240,9 +265,11 @@ node_t* get_while (const tokens_t *tokens, size_t *tp, tree_t *tree)            
         while_node = tree_insert(&temp_node);
         ++*tp;
         l_node = get_brackets(tokens, tp, tree);
+        check(l_node)
         log(3, "Token type in while: %d %s", arg[*tp].type, arg[*tp].name);
 
         while_node->right = get_curv_brack(tokens, tp, tree);
+        check(while_node->right)
         while_node->left  =  l_node;
         while_node->atr.fillcolor = "#00d8ff";
 
@@ -259,6 +286,7 @@ node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node   = get_brackets(tokens, tp, tree);
+        check(l_node)
         node_t *node     = nullptr;
         node_t temp_node = {};
 
@@ -270,6 +298,7 @@ node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree)
 
                 node->left  = l_node;
                 node->right = get_brackets(tokens, tp, tree);
+                check(node->right)
                 node->atr.fillcolor = "#98B1B5";
         } else if (arg[*tp].type == RELATIVE_OP) {
                 edit_temp(&temp_node, arg + *tp);
@@ -300,6 +329,7 @@ node_t* get_conj (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 node->left  = l_node;
 
                 node->right = get_brackets(tokens, tp, tree);
+                check(node->right)
                 node->atr.fillcolor = "#98B1B5";
         }
 
@@ -319,13 +349,16 @@ node_t* get_brackets (const tokens_t *tokens, size_t *tp, tree_t *tree)
         if (arg[*tp].type == OP_BRACKET) {
                 ++*tp;
                 node = get_div_mul(tokens, tp, tree);
+                check(node)
                 log(2, "Type after e: %d", arg[*tp].type);
 
-                check_symb(tokens, tp, ')');
+                if (check_type(tokens, tp, CL_BRACKET, "There are expected )", 1))
+                        return nullptr;
                 assert(arg[*tp].type == CL_BRACKET);
                 ++*tp;
         } else {
                 node = get_next_elem(tokens, tp, tree);
+                check(node)
         }
 
         log(2, "Type after P %d", arg[*tp].type);
@@ -339,6 +372,7 @@ node_t* get_next_elem (const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node = get_assign(tokens, tp, tree);
+        check(l_node)
         node_t *node   = nullptr;
 
         if (arg[*tp].type == NEXT_ELEM) {
@@ -350,6 +384,7 @@ node_t* get_next_elem (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 if (check_arg(tokens, tp))
                         return nullptr;
                 node->right = get_div_mul(tokens, tp, tree);
+                check(node->right)
                 log(2, "In NEXT_ELEM after E: %d", arg[*tp].type);
                 node->left = l_node;
         }
@@ -366,6 +401,7 @@ node_t* get_assign(const tokens_t *tokens, size_t *tp, tree_t *tree)
         assert_ptr(tree);
 
         node_t *l_node = get_curv_brack(tokens, tp, tree);
+        check(l_node)
         node_t *node   = nullptr;
 
         while (arg[*tp].type == ASSIGNMENT) {
@@ -376,6 +412,7 @@ node_t* get_assign(const tokens_t *tokens, size_t *tp, tree_t *tree)
                 ++*tp;
 
                 node_t *r_node = get_div_mul(tokens, tp, tree);
+                check(r_node)
 
                 edit_temp(&temp_node, &token);
                 node = tree_insert(&temp_node);
@@ -404,13 +441,16 @@ node_t* get_curv_brack (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 ++*tp;
                 log(2, "Type after { %d", arg[*tp].type);
                 node = get_end_line(tokens, tp, tree);
+                check(node)
                 log(3, "Type in cb: %d name: %s", arg[*tp].type, arg[*tp].name);
 
-                check_symb(tokens, tp, '}');
+                if (check_type(tokens, tp, CL_C_BRACKET, "There are expected }", 1))
+                        return nullptr;
                 assert(arg[*tp].type == CL_C_BRACKET);
                 ++*tp;
         } else {
                 node = get_func(tokens, tp, tree);
+                check(node)
         }
 
         log(2, "Type after cb %d", arg[*tp].type);
@@ -435,12 +475,14 @@ node_t* get_func_init (const tokens_t *tokens, size_t *tp, tree_t *tree)
         node = tree_insert(&temp_node);
         log(3, "Created function with type: \"%d\", name: \"%s\"", temp_node.sub_type, temp_node.name);
 
-        if (arg[*tp + 1].type != CL_BRACKET)
+        if (arg[*tp + 1].type != CL_BRACKET) {
                 node->left = get_brackets(tokens, tp, tree);
-        else
+                check(node->left)
+        } else
                 *tp += 2;
         log(1, "after p in func init");
         node->right = get_curv_brack(tokens, tp, tree);
+        check(node->right)
 
         log(2, "Type after function %d", arg[*tp].type);
         return node;
@@ -463,12 +505,14 @@ node_t *get_func (const tokens_t *tokens, size_t *tp, tree_t *tree)
                 temp_node.atr.fillcolor = "#D681C2";
 
                 node = tree_insert(&temp_node);
-                if (arg[*tp + 1].type != CL_BRACKET)
+                if (arg[*tp + 1].type != CL_BRACKET) {
                         node->left  = get_brackets(tokens, tp, tree);
-                else
+                        check(node->left)
+                } else
                         *tp += 2;
         } else {
                 node = get_n(tokens, tp, tree);
+                check(node)
         }
 
         return node;
@@ -515,6 +559,8 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                                 log(3, "Created variable with type: \"%d\", name: \"%s\"", node.sub_type, node.name);
                                 node.atr.fillcolor = "#93F558";
                         } else {
+                                if (check_type(tokens, tp + 1, NAME, "No variable name after data type", 1))
+                                        return nullptr;
                                 log_error(1, "!No variable name after data type!");
                                 recycle = 0;
                         }
@@ -530,8 +576,12 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                                 log(1, "Unknown standart command");
                         }
                         ++*tp;
-                        if (check_arg(tokens, tp))
-                                return nullptr;
+                        if (check_type(tokens, tp, NAME, "No argument after standart function", 0)) {
+                                if (check_type(tokens, tp, NUMBER, "No argument after standart function", 0))
+                                        if (check_type(tokens, tp, FUNC, "No argument after standart function", 1))
+                                                return nullptr;
+                        }
+
 
                         node.left = get_div_mul(tokens, tp, tree);
                         break;

@@ -1,10 +1,10 @@
 BACK_CFILES = backend\main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp         \
 	      frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp backend\backend.cpp     \
-	      tree\tree_2_text.cpp tree\errors_handler.cpp backend\tables.cpp
+	      tree\tree_2_text.cpp utils\errors_handler.cpp backend\tables.cpp
 
 FRONT_CFILES = frontend\main.cpp tree\tree.cpp tree\tree_dump.cpp tree\text_tree.cpp log\log.cpp       \
 	       frontend\lexer.cpp frontend\graph_tokens.cpp tree\token_tree.cpp 		       \
-	       tree\tree_2_text.cpp tree\errors_handler.cpp
+	       tree\tree_2_text.cpp utils\errors_handler.cpp
 
 ASM_CFILES = backend\CPU\buffer.cpp backend\CPU\asm\main.cpp backend\CPU\asm\assembler.cpp
 ASM_OUTPUT = asm.exe

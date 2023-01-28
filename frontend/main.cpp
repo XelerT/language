@@ -41,9 +41,13 @@ int main (int argc, char *argv[])
 
         size_t tp = 0;
         tree.root = get_g(&tokens, &tp, &tree);
+        if (!tree.root) {
+                fprintf(stderr, "\tLexical error.\n");
+                return LEX_ERROR;
+        }
 
-        tree_graph(&tree, "output_utils\\tree_graph.dot", "front_tree.png");
-        system("make graph_tree IMG_PATH=output_utils\\front_tree.png");
+        // tree_graph(&tree, "output_utils\\tree_graph.dot", "front_tree.png");
+        // system("make graph_tree IMG_PATH=output_utils\\front_tree.png");
 
         execution_status = tree_2_text(&tree, "tree.dreva");
         if (execution_status)
