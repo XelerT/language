@@ -1,7 +1,7 @@
 #ifndef CMD_H
 #define CMD_H
 
-#include "..\..\include\utils.h"
+#include "../../include/utils.h"
 
 // DEFINE_REG(DICK, 0x0, 'big_dick', HIDDEN, )
 #define DEF_REG(name,num) REG_##name = num,

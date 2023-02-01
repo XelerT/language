@@ -7,8 +7,8 @@ typedef int elem_t;
 #define ASSERT_ON
 #define DEBUG
 
-#include "..\debug\debug.h"
-#include "..\log\log.h"
+#include "../debug/debug.h"
+#include "../log/log.h"
 #include "utils.h"
 
 #endif /*CONFIG_H*/

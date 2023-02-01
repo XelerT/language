@@ -1,7 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include "..\tree\text_tree.h"
+#include "../tree/text_tree.h"
 #include "tokens.h"
 
 enum lexer_errors {

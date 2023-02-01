@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include "..\buffer.h"
-#include "..\cmd.h"
+#include "../buffer.h"
+#include "../cmd.h"
 
 int divide_cmds (code_t *code);
 int dis_asm_code (code_t *code, const char *input_file_name);

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
-#include "..\include\graph_tokens.h"
+#include "../include/graph_tokens.h"
 
 static const char digraph_atr_sample[] = "digraph %s {                                  \
                                                 \ngraph [dpi = %d];                     \

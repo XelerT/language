@@ -1,7 +1,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include "..\include\config.h"
+#include "../include/config.h"
 
 
 #ifdef DEBUG
@@ -13,7 +13,7 @@
 #define $s(arg) fprintf(stderr, "String in File: %s, Line: %d\n%s\n", __FILE__, __LINE__, arg);
 
 #define $d(arg) fprintf(stderr, "Decimal %s: %d, File: %s, Line: %d\n", #arg, arg, __FILE__, __LINE__);
-#define $lld(arg) fprintf(stderr, "Var: \"%s\", Size_t: %lld, File: %s, Line: %d\n", #arg, arg, __FILE__, __LINE__);
+#define $lld(arg) fprintf(stderr, "Var: \"%s\", Size_t: %ld, File: %s, Line: %d\n", #arg, arg, __FILE__, __LINE__);
 
 #define $dbl(arg) fprintf(stderr, "Double: %llg, File: %s, Line: %d\n", arg, __FILE__, __LINE__);
 

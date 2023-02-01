@@ -2,7 +2,7 @@
 #define TOKEN_TREE_H
 
 #include "tree.h"
-#include "..\include\tokens.h"
+#include "../include/tokens.h"
 
 node_t* get_g          (const tokens_t *tokens, size_t *tp, tree_t *tree);
 node_t* get_end_line   (const tokens_t *tokens, size_t *tp, tree_t *tree);

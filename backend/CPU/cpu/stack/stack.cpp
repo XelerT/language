@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstdlib>
 #include <assert.h>
 #include <math.h>
 #include <cstdint>
@@ -157,20 +158,20 @@ int stack_dump (stack *stk, const char *func, const char *file, int line) // pri
                                 printf(" %s at %s (%d):\n"
                                        " Stack[%p] (%s)\n"
                                        " %s at %s at %s (%d)\n"
-                                       " size = %lld,"
-                                       " capacity = %lld,"
+                                       " size = %ld,"
+                                       " capacity = %ld,"
                                        " data[%p]\n", func, file, line,
                                        (stk == nullptr) ? 0: stk, (stk == nullptr) ? "mistake": "ok", stk->info.var,
                                        stk->info.func, stk->info.file, stk->info.line, stk->size, stk->capacity, (stk->data == nullptr) ? 0: stk->data);
 #ifdef HASH_ON
-                                printf("Required stack hash: %lld\nActual   stack hash: %lld\n", stk->hash->hash_stack, gnu_hash_stack (SEED));
-                                printf("Required  data hash: %lld\nActual    data hash: %lld\n", stk->hash->hash_data,  gnu_hash_data  (stk, SEED));
+                                printf("Required stack hash: %ld\nActual   stack hash: %ld\n", stk->hash->hash_stack, gnu_hash_stack (SEED));
+                                printf("Required  data hash: %ld\nActual    data hash: %ld\n", stk->hash->hash_data,  gnu_hash_data  (stk, SEED));
 #endif /*HASH_ON*/
                                 for (size_t j = 0; j < stk->capacity; j++) {
                                         if (stk->data[j] == POISON)
-                                                        printf("[%lld] = NAN(POISON)\n", j);
+                                                        printf("[%ld] = NAN(POISON)\n", j);
                                         else
-                                                printf("*[%lld] = %d\n", j, stk->data[j]);
+                                                printf("*[%ld] = %d\n", j, stk->data[j]);
                                 }
                         }
                         multp_errors = 1;

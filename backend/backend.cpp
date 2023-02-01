@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "..\tree\tree.h"
+#include "../tree/tree.h"
 #include "backend.h"
 
 int create_asm (tree_t *tree, const char *file_name)
@@ -30,10 +30,10 @@ int create_asm (tree_t *tree, const char *file_name)
 #define push(num)               fprintf(output, "push %d %s", num, "\n")
 
 #define rel_op(command,name,num)    log(2, "START Asm %s", #name);                                                   \
-                                    fprintf(output, "%s %s%lld\n", #command, #name, num);                            \
+                                    fprintf(output, "%s %s%ld\n", #command, #name, num);                            \
                                     fprintf(output, "pop\n");                                                        \
                                     push(0);                                                                         \
-                                    fprintf(output, "%s%lld:\n", #name, num);                                        \
+                                    fprintf(output, "%s%ld:\n", #name, num);                                        \
                                     break;
 
 #pragma GCC diagnostic ignored "-Wlogical-op"
@@ -203,7 +203,7 @@ int asm_node (node_t *node, tab_table_t *table, FILE *output)
                 log(1, "div");
                 break;
         default:
-                log(2, "Default switch case in assembling(%s, type:%lld)", node->name, node->type);
+                log(2, "Default switch case in assembling(%s, type:%ld)", node->name, node->type);
         }
         return 0;
 }
@@ -219,12 +219,12 @@ int indent_rbx (FILE *output, size_t n_args)
         fprintf(output, "pop rdx\n");
         fprintf(output, "push rbx\n");
         fprintf(output, "push rbx\n");
-        fprintf(output, "push %lld\n", n_args);
+        fprintf(output, "push %ld\n", n_args);
         fprintf(output, "add\n");
         fprintf(output, "pop rbx\n");
         fprintf(output, "push rdx\n");
 
-        log(2, "Indent rbx on %lld", n_args);
+        log(2, "Indent rbx on %ld", n_args);
 
         return 0;
 }
@@ -317,17 +317,17 @@ int asm_while (FILE *output, tab_table_t *table, node_t *node)
                         return REALLOC_ERR;
                 table->loc_tables[table->loc_size++] = &loc_table;
         }
-        fprintf(output, "while_%lld:\n", gl_table->while_size);
+        fprintf(output, "while_%ld:\n", gl_table->while_size);
         if (node->left) {
                asm_node(node->left, table, output);
         }
         push(0);
-        fprintf(output, "je end_while_%lld\n", gl_table->while_size);
+        fprintf(output, "je end_while_%ld\n", gl_table->while_size);
         if (node->right) {
                 asm_node(node->right, table, output);
         }
-        fprintf(output, "jmp while_%lld\n",  gl_table->while_size);
-        fprintf(output, "end_while_%lld:\n", gl_table->while_size++);
+        fprintf(output, "jmp while_%ld\n",  gl_table->while_size);
+        fprintf(output, "end_while_%ld:\n", gl_table->while_size++);
 
         log(1, "END Asm WHILE");
         table_dtor(&loc_table);
@@ -351,16 +351,16 @@ int asm_and (FILE *output, tab_table_t *table, node_t *node)
                 asm_node(node->left, table, output);
         }
         push(0);
-        fprintf(output, "je cond_and_1_%lld\n", gl_table->and_size);
+        fprintf(output, "je cond_and_1_%ld\n", gl_table->and_size);
         if (node->right) {
                 asm_node(node->right, table, output);
         }
         push(0);
-        fprintf(output, "je cond_and_2_%lld\n", gl_table->and_size);
+        fprintf(output, "je cond_and_2_%ld\n", gl_table->and_size);
         fprintf(output, "pop\n");
         fprintf(output, "push 1\n");
-        fprintf(output, "cond_and_1_%lld:\n", gl_table->and_size);
-        fprintf(output, "cond_and_2_%lld:\n", gl_table->and_size++);
+        fprintf(output, "cond_and_1_%ld:\n", gl_table->and_size);
+        fprintf(output, "cond_and_2_%ld:\n", gl_table->and_size++);
 
         log(1, "END Asm AND");
         return 0;
@@ -381,15 +381,15 @@ int asm_or (FILE *output, tab_table_t *table, node_t *node)
                 asm_node(node->left, table, output);
         }
         push(0);
-        fprintf(output, "jne cond_or_%lld\n", gl_table->or_size);
+        fprintf(output, "jne cond_or_%ld\n", gl_table->or_size);
         if (node->right) {
                 asm_node(node->right, table, output);
         }
         push(0);
-        fprintf(output, "jne cond_or_%lld\n", gl_table->or_size);
+        fprintf(output, "jne cond_or_%ld\n", gl_table->or_size);
         fprintf(output, "pop\n");
         fprintf(output, "push 0\n");
-        fprintf(output, "cond_or_%lld:\n", gl_table->or_size++);
+        fprintf(output, "cond_or_%ld:\n", gl_table->or_size++);
 
         log(1, "END Asm OR");
         return 0;
@@ -420,25 +420,25 @@ int asm_operator (FILE *output, tab_table_t *table, node_t *node)
 
                         indent = gl_table->if_size;
                         push(0);
-                        fprintf(output, "je end_if_%lld\n", gl_table->if_size++);
+                        fprintf(output, "je end_if_%ld\n", gl_table->if_size++);
                         if (node->right->left) {
                                 asm_node(node->right->left, table, output);
                         }
-                        fprintf(output, "jmp end_else_%lld\n", indent);
-                        fprintf(output, "end_if_%lld:\n", indent);
+                        fprintf(output, "jmp end_else_%ld\n", indent);
+                        fprintf(output, "end_if_%ld:\n", indent);
                         if (node->right->right) {
                                 asm_node(node->right->right, table, output);
-                                fprintf(output, "end_else_%lld:\n", indent);
+                                fprintf(output, "end_else_%ld:\n", indent);
                         }
                         log(1, "END Asm ELSE");
                 } else {
                         indent = gl_table->if_size;
                         push(0);
-                        fprintf(output, "je end_if_%lld\n", gl_table->if_size++);
+                        fprintf(output, "je end_if_%ld\n", gl_table->if_size++);
                         if (node->right) {
                                 asm_node(node->right, table, output);
                         }
-                        fprintf(output, "end_if_%lld:\n", indent);
+                        fprintf(output, "end_if_%ld:\n", indent);
                 }
                 log(1, "END Asm IF");
         }
@@ -484,7 +484,7 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
         int is_main = 1;
 
         if (strcmp(node->name, "main")) {
-                fprintf(output, "\njmp skip%lld \n", gl_table->func_size);
+                fprintf(output, "\njmp skip%ld \n", gl_table->func_size);
                 is_main = 0;
         }
         fprintf(output, "%s:\n", node->name);
@@ -514,16 +514,16 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
         if (loc_table.var_size != 0) {
                 for (size_t i = loc_table.var_size - 1; i > 0 && !is_main; i--) {
                         if (loc_table.vars[i].type == INT)
-                                fprintf(output, "pop [rbx + %lld]\n", i);
+                                fprintf(output, "pop [rbx + %ld]\n", i);
                         else if (loc_table.vars[i].type == FLOAT)
-                                fprintf(output, "popf [rbx + %lld]\n", i);
+                                fprintf(output, "popf [rbx + %ld]\n", i);
 
                         log(2, "Add argument with \"%s\" name", loc_table.vars[i].name);
                 }
         }
         loc_table.var_size = n_args - loc_table.var_size;
 
-        log(3, "here %s %lld", node->name, node->right->type);
+        log(3, "here %s %ld", node->name, node->right->type);
 
         if (node->right)
                 asm_node(node->right, table, output);
@@ -535,7 +535,7 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
         }
 
         if (!is_main) {
-                fprintf(output, "skip%lld:\n\n", gl_table->func_size++);
+                fprintf(output, "skip%ld:\n\n", gl_table->func_size++);
         }
 
         log(2, "Assmed \"%s\" function", node->name);
@@ -571,25 +571,25 @@ int asm_name (FILE *output, tab_table_t *table, node_t *node)
                 if (table->loc_tables[loc_t_indent - 1]->vars[indent].type == INT) {
                         if (node->casted) {
                                 fprintf(output, "push 100\n");
-                                fprintf(output, "pushf [rbx + %lld]\n", indent);
+                                fprintf(output, "pushf [rbx + %ld]\n", indent);
                                 fprintf(output, "mul\n");
                         } else {
-                                fprintf(output, "push [rbx + %lld]\n", indent);
+                                fprintf(output, "push [rbx + %ld]\n", indent);
                         }
                 } else if (table->loc_tables[loc_t_indent - 1]->vars[indent].type == FLOAT) {
-                        fprintf(output, "push [rbx + %lld]\n", indent);
+                        fprintf(output, "push [rbx + %ld]\n", indent);
                 }
         } else {
                 if (gl_table->vars[indent].type == INT) {
                         if (node->casted) {
                                 fprintf(output, "push 100\n");
-                                fprintf(output, "pushf [rax + %lld]\n", indent);
+                                fprintf(output, "pushf [rax + %ld]\n", indent);
                                 fprintf(output, "mul\n");
                         } else {
-                                fprintf(output, "push [rax + %lld]\n", indent);
+                                fprintf(output, "push [rax + %ld]\n", indent);
                         }
                 } else if (gl_table->vars[indent].type == FLOAT) {
-                        fprintf(output, "push [rax + %lld]\n", indent);
+                        fprintf(output, "push [rax + %ld]\n", indent);
                 }
         }
 
@@ -659,7 +659,7 @@ int cast_type (node_t *node, tab_table_t *table)
                         second_in_loc_table = 1;
                         }
                 }
-                log(3, "Indent1: %lld, Indent2: %lld", indent1, indent2);
+                log(3, "Indent1: %ld, Indent2: %ld", indent1, indent2);
 
                 int first_var_type = 0;
                 int second_var_type = 0;
@@ -764,9 +764,9 @@ int asm_assignment (FILE *output, node_t *node, tab_table_t *table)
                 fprintf(output, "mul\n");
         }
         if (first_var_type == INT)
-                fprintf(output, "pop [%s + %lld]\n", first_in_loc_table ? "rbx": "rax", indent);
+                fprintf(output, "pop [%s + %ld]\n", first_in_loc_table ? "rbx": "rax", indent);
         else if (first_var_type == FLOAT)
-                fprintf(output, "popf [%s + %lld]\n", first_in_loc_table ? "rbx": "rax", indent);
+                fprintf(output, "popf [%s + %ld]\n", first_in_loc_table ? "rbx": "rax", indent);
 
         log(2, "Assigned to rax + %d", indent);
 
@@ -794,7 +794,7 @@ int asm_scan (FILE *output, node_t *node, tab_table_t *table)
                         }
                         in_loc_table = 1;
                 }
-                fprintf(output, "pop [%s + %lld]\n", in_loc_table ? "rbx": "rax", indent);
+                fprintf(output, "pop [%s + %ld]\n", in_loc_table ? "rbx": "rax", indent);
         }
 
         return 0;

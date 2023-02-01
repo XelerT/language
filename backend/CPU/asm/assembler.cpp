@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include "assembler.h"
-#include "..\buffer.h"
+#include "../buffer.h"
 
 int check_argv (int argc, char **argv)
 {
@@ -56,7 +56,7 @@ int pre_asm (code_t *code)
                                 is_pop = !strncmp(code->lines[i].ptr, "popf [", 6);
                                 is_push = !strncmp(code->lines[i].ptr, "pushf [", 7);
                                 if (is_pop == is_push) {
-                                        fprintf(stderr, "Lexical mistake in %lld line. \"%s\"\n", i, code->lines[i].ptr);
+                                        fprintf(stderr, "Lexical mistake in %ld line. \"%s\"\n", i, code->lines[i].ptr);
                                         return LEX_ERROR;
                                 }
                         }
@@ -234,9 +234,9 @@ int asm_jmp_call (int second_cycle, code_t *code, int *asm_code,
         } else {
                 char label_name[MAX_NAME_LENGTH] = {0};
                 sscanf(code->lines[i].ptr + strlen(cmd), "%s", label_name);
-                        if (stricmp(cmd, "jmp") == 0)
+                        if (strcasecmp(cmd, "jmp") == 0)
                                 asm_code[*ip] = -1;
-                        else if (stricmp(cmd, "call") == 0)
+                        else if (strcasecmp(cmd, "call") == 0)
                                 asm_code[*ip] = -2;
         }
         ++*ip;
@@ -267,7 +267,7 @@ int get_pp_code (const char *val, int *asm_code, const char *cmd, int coeff)
                 if ((reg = find_reg(temp_val)) > 0) {
                         num = ARG_REG;
                         *asm_code = reg;
-                } else if ((stricmp(cmd, "push") == 0) || (stricmp(cmd, "pushf") == 0)) {
+                } else if ((strcasecmp(cmd, "push") == 0) || (strcasecmp(cmd, "pushf") == 0)) {
                         if (sscanf(val, "%f", &dot_num)) {
                         // printf("dotnum %f\n", dot_num);
                                 *asm_code = (int) (dot_num * (float) coeff);
@@ -278,12 +278,12 @@ int get_pp_code (const char *val, int *asm_code, const char *cmd, int coeff)
                 }
         }
 
-        if (stricmp(cmd, "pop") == 0  || (stricmp(cmd, "popf") == 0))
+        if (strcasecmp(cmd, "pop") == 0  || (strcasecmp(cmd, "popf") == 0))
                 return num | CMD_POP;
-        else if (stricmp(cmd, "push") == 0 || (stricmp(cmd, "pushf") == 0))
+        else if (strcasecmp(cmd, "push") == 0 || (strcasecmp(cmd, "pushf") == 0))
                 return num | CMD_PUSH;
 
-        return NULL;
+        return 0;
 }
 
 void listing (code_t *code, int *asm_code, char *function, int line)
@@ -348,7 +348,7 @@ int find_reg (const char *val)
         for (int i = 0; *(val + i) != '\0'; i++)
                 upper_val[i] = (char) toupper(*(val + i));
         static const char *regs_names[N_REGS] = {
-#include "..\registers.en"
+#include "../registers.en"
                 "R0X"
         };
 

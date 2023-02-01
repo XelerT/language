@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "cpu.h"
-#include "..\..\..\include\utils.h"
-#include "..\..\..\debug\debug.h"
+#include "../../../include/utils.h"
+#include "../../../debug/debug.h"
 
 int main (int argc, char *argv[])
 {

@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <cstdlib>
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
 #include "assembler.h"
-#include "..\..\..\include\utils.h"
-#include "..\..\..\debug\debug.h"
+#include "../../../include/utils.h"
+#include "../../../debug/debug.h"
 
 int main (int argc, char *argv[])
 {
@@ -19,7 +20,6 @@ int main (int argc, char *argv[])
                 printf("Source file pointer is null.\n");
                 return NO_SOURCE;
         }
-
         strcpy(output_file_name, argv[1]);
         append_txt(output_file_name);
         output_code = fopen(output_file_name, "w");
@@ -39,21 +39,16 @@ int main (int argc, char *argv[])
                 printf("Calloc return null pointer.\n");
                 return NULL_CALLOC;
         }
-
         pre_asm(&code);
 
         if (convert_code(&code, output_code, 0, labels, asm_code) == NO_LABEL) {
                 fprintf(stderr, "No label\n");
                 return NO_LABEL;
         }
-        return 0;
-        $
         free(code.buf);
-        $
         free(code.lines);
-        $
         free(code.cmds);
-        // free(asm_code);
+        free(asm_code);
         fclose(output_code);
         return 0;
 }

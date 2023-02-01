@@ -5,13 +5,13 @@
                 ip += 2;}
 
 #define DEF_CMD(name_,num,arg,...)                       \
-                if (stricmp(cmd,#name_) == 0) {          \
+                if (strcasecmp(cmd,#name_) == 0) {          \
                         asm_code[ip] = CMD_##name_;      \
                         ip++;                            \
                 } else
 
 #define DEF_STND_CMD(name_,num,arg,...)                 \
-                if (stricmp(cmd,#name_) == 0) {         \
+                if (strcasecmp(cmd,#name_) == 0) {         \
                         if (arg)                        \
                                 __VA_ARGS__             \
                 } else
@@ -21,14 +21,14 @@
 //                                return NO_LABEL;}
 
 #define DEF_J_CMD(name_,num,arg,...)                                    \
-                if (stricmp(cmd,#name_) == 0) {                         \
+                if (strcasecmp(cmd,#name_) == 0) {                         \
                         asm_code[ip++] = CMD_##name_;                   \
                         if (asm_jmp_call(second_cycle, code,            \
                                 asm_code, cmd, name, labels, i, &ip))   \
                                         return NO_LABEL;                \
                 } else
 
-#include "..\instructions.en"
+#include "../instructions.en"
 
 #undef PP_CASE
 #undef CALL_

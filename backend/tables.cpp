@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstdlib>
 #include "tables.h"
 
 int tab_table_ctor (tab_table_t *table, size_t capacity)

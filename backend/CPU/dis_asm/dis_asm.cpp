@@ -53,7 +53,7 @@ int dis_asm_code (code_t *code, const char *input_file_name)
 
         while (code->cmds[ip] != CMD_HLT) {
                 switch (code->cmds[ip] & MASK_CMD) {
-#include "..\instructions.en"
+#include "../instructions.en"
                 default:
                         if (code->cmds[ip] == CMD_LABEL)
                                 fprintf(output, "LABEL\n");

@@ -1,7 +1,7 @@
 #ifndef BACKEND_H
 #define BACHEND_H
 
-#include "..\include\utils.h"
+#include "../include/utils.h"
 #include "tables.h"
 
 const size_t SIZE_T_ERROR = 9999999999;

@@ -23,12 +23,15 @@ void get_code (FILE *input, code_t *code, char *code_file)
         n_chars = fread(buf, sizeof(char), file.st_size, input);
         code->n_chars = n_chars;
 
+        size_t n_lines = 0;
+
         for (size_t i = 0; i < n_chars; i++)
-                if (buf[i] == '\n')
+                if (buf[i] == '\n') {
                         buf[i] = '\0';
+                        n_lines++;
+                }
 
         code->buf = buf;
-        size_t n_lines = file.st_size - n_chars;
         code->n_lines = n_lines;
         divide_code (code);
 }

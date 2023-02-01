@@ -1,13 +1,13 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "..\include\config.h"
-#include "..\include\tokens.h"
+#include "../include/config.h"
+#include "../include/tokens.h"
 
 #define KW(name,type,number) name = number,
 
 enum key_words_types {
-        #include "..\include\key_words.kw"
+        #include "../include/key_words.kw"
 };
 
 #undef KW

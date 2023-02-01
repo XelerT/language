@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "include\UI.h"
+#include "include/UI.h"
 
 int run_frontend (char *output_file_name, char *input_file_name)
 {
@@ -11,7 +11,7 @@ int run_frontend (char *output_file_name, char *input_file_name)
 
         char run_frontend[MAX_NAME_LENGTH * 2] = {};
 
-        if (!sprintf(run_frontend, "front.exe %s %s", output_file_name, input_file_name))
+        if (!sprintf(run_frontend, "./front %s %s", output_file_name, input_file_name))
                 return NULL_SPRINTF;
 
         system(run_frontend);
@@ -27,7 +27,7 @@ int run_backend (char *output_file_name, char *input_file_name)
 
         char run_backend[MAX_NAME_LENGTH * 4] = {};
 
-        if (!sprintf(run_backend, "back.exe %s %s", output_file_name, input_file_name))
+        if (!sprintf(run_backend, "./back %s %s", output_file_name, input_file_name))
                 return NULL_SPRINTF;
 
         system(run_backend);
@@ -43,7 +43,7 @@ int run_asm (char *output_file_name, char *input_file_name)
 
         char run_asm[MAX_NAME_LENGTH * 4] = {};
 
-        if (!sprintf(run_asm, "asm.exe %s %s", output_file_name, input_file_name))
+        if (!sprintf(run_asm, "./asm %s %s", output_file_name, input_file_name))
                 return NULL_SPRINTF;
 
         system(run_asm);
@@ -58,7 +58,7 @@ int run_cpu (char *input_file_name)
 
         char run_cpu[MAX_NAME_LENGTH * 4] = {};
 
-        sprintf(run_cpu, "cpu.exe %s", input_file_name);
+        sprintf(run_cpu, "./cpu %s", input_file_name);
 
         system(run_cpu);
         fprintf(stderr, "\nRun cpu\n\n");

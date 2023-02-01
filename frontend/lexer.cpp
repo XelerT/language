@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
 #include <locale.h>
-#include "..\include\lexer.h"
-#include "..\log\log.h"
-#include "..\include\graph_tokens.h"
+#include "../include/lexer.h"
+#include "../log/log.h"
+#include "../include/graph_tokens.h"
 
 tokens_t* tokens_ctor (tokens_t *tokens, size_t capacity)
 {
@@ -23,7 +24,7 @@ tokens_t* tokens_ctor (tokens_t *tokens, size_t capacity)
                 // return NULL_CALLOC;
         }
         tokens->capacity = capacity;
-        log(2, "Created tokens with capacity %lld.", tokens->capacity);
+        log(2, "Created tokens with capacity %ld.", tokens->capacity);
 
         return tokens;
 }
@@ -88,16 +89,16 @@ int get_tokens (tokens_t *tokens, const char *file_name)
                         tokens->tok_args[i].n_line = n_line;
                         tokens->size += 1;
 
-                        log(2, "Number of tokens: %lld", tokens->size);
-                        log(4, "token(%lld) is \"%s\", type: %d", i, tokens->tok_args[i].name, tokens->tok_args[i].type);
+                        log(2, "Number of tokens: %ld", tokens->size);
+                        log(4, "token(%ld) is \"%s\", type: %d", i, tokens->tok_args[i].name, tokens->tok_args[i].type);
                 } else {
                         i--;
                 }
         }
 
-        log(2, "%lld", tokens->size);
+        log(2, "%ld", tokens->size);
         tokens->tok_args[tokens->size].type = END_FILE;
-        log(4, "token(%lld) is \"%s\", type: %d", tokens->size, tokens->tok_args[tokens->size].name,
+        log(4, "token(%ld) is \"%s\", type: %d", tokens->size, tokens->tok_args[tokens->size].name,
                                        tokens->tok_args[tokens->size].type);
 
         tokens->tok_args[tokens->size].name[0] = '/';
@@ -108,7 +109,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
         return 0;
 }
 
-#define KW(name_arg,type_arg,num)       if (!stricmp(#name_arg, token->name)) {                 \
+#define KW(name_arg,type_arg,num)       if (!strcasecmp(#name_arg, token->name)) {                 \
                                                 token->type = type_arg;                         \
                                                 token->sub_type = num;                          \
                                         } else
@@ -121,7 +122,7 @@ int get_tokens (tokens_t *tokens, const char *file_name)
                                                 } else {                                                   \
                                                         get_punct(token, buf, ip, n_line);                 \
                                                 }                                                          \
-                                                log(2, "*****%lld****", type_arg);                         \
+                                                log(2, "*****%ld****", type_arg);                         \
                                                 break;
 
 #define assign(num) token->name[num] = buf[*ip]
@@ -139,7 +140,7 @@ int get_arg (tokens_t *tokens, char *buf, size_t *ip, size_t tp, size_t *n_line)
 
         if (isalpha(buf[*ip])) {
                 get_word(token, buf, ip);
-#include "..\include\key_words.kw"
+#include "../include/key_words.kw"
                 /*else*/
                         token->type = NAME;
                 log(3, "Got token with name: \"%s\" and type: \"%d\"", token->name, token->sub_type);
@@ -149,7 +150,7 @@ int get_arg (tokens_t *tokens, char *buf, size_t *ip, size_t tp, size_t *n_line)
                 log(2, "DIGIT-TOKEN has type %d", token->type);
         } else {
                 switch (buf[*ip]) {
-#include "..\include\symbles.sym"
+#include "../include/symbles.sym"
                 default:
                         log(1, "here");
                         if (!get_relat_op(token, buf, ip)) {
@@ -269,7 +270,7 @@ int get_punct (token_arg_t *token, char *buf, size_t *ip, size_t *n_line)
         assert_ptr(ip);
 
         switch (buf[*ip]) {
-#include "..\include\symbles.sym"
+#include "../include/symbles.sym"
         default:
                 return 0;
         }

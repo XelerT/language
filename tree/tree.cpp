@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <cstdlib>
 #include "tree.h"
 
 int tree_ctor (tree_t *tree)

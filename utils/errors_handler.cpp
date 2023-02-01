@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <assert.h>
 
-#include "..\include\errors_handler.h"
+#include "../include/errors_handler.h"
 
 int check_arg (const tokens_t *tokens, size_t *tp)
 {
@@ -89,5 +89,5 @@ void dump_error (const tokens_t *tokens, const size_t *tp, const char *explanati
         }
         printf("|\n");
 
-        printf("%s (line: %lld, symbal: %lld)\n", explanation, tokens->tok_args[*tp].n_line, j);
+        printf("%s (line: %ld, symbal: %ld)\n", explanation, tokens->tok_args[*tp].n_line, j);
 }

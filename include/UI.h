@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "utils.h"
-#include "..\log\log.h"
+#include "../log/log.h"
 
 int run_frontend          (char *output_file_name, char *input_file_name);
 int run_backend           (char *output_file_name, char *input_file_name);

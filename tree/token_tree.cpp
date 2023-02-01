@@ -5,10 +5,10 @@
 #include <assert.h>
 
 
-#include "..\include\lexer.h"
-#include "..\include\config.h"
+#include "../include/lexer.h"
+#include "../include/config.h"
 #include "token_tree.h"
-#include "..\include\errors_handler.h"
+#include "../include/errors_handler.h"
 
 #define arg tokens->tok_args
 
@@ -567,7 +567,7 @@ node_t* get_n (const tokens_t *tokens, size_t *tp, tree_t *tree)
                         break;
                 case STAFF:
                         node.type = STAFF;
-#include "..\include\special_cmds.cmds"
+#include "../include/special_cmds.cmds"
                         /*else*/ if (arg[*tp].sub_type == RETURN) {
                                         node.sub_type = RETURN;
                                         strcpy(node.name, "return");

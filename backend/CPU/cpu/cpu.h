@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include "..\buffer.h"
-#include "stack\stack.h"
-#include "..\cmd.h"
+#include "../buffer.h"
+#include "stack/stack.h"
+#include "../cmd.h"
 
 static const int  DEFAULT_CAPACITY =   50;
 static const int REGISTER_CAPACITY =    8;

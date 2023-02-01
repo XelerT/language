@@ -119,7 +119,7 @@ void print_gv_nodes (node_t *node)
         const char node_sample_ope[]  = "node%p [shape = record label = \"{%s | {%s | %d}}\"];\n";
 
         if (node->type == VARIABLE) {
-                #include "..\include\key_words.kw"
+                #include "../include/key_words.kw"
                 log(3, "Graph variable with type: \"%d\", name: \"%s\"", node->sub_type, node->name);
         } else if (node->type == OPERATOR) {
                 gv_print(node_sample_ope, node, node->name, "operator", node->sub_type);

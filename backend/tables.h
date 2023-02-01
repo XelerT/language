@@ -1,8 +1,8 @@
 #ifndef TABLES_H
 #define TABLES_H
 
-#include "..\include\utils.h"
-#include "..\log\log.h"
+#include "../include/utils.h"
+#include "../log/log.h"
 
 struct variable_t {
         char name[MAX_NAME_LENGTH] = {'\0'};

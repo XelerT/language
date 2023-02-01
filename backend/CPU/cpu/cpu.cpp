@@ -60,7 +60,7 @@ int execute_code (code_t *code, stack *stk, cpu_t *cpu)
 
         while (code->cmds[ip] != CMD_HLT) {
                 switch (code->cmds[ip] & MASK_CMD) {
-#include "..\instructions.en"
+#include "../instructions.en"
                 case CMD_CALL_LABEL:
                         while (code->cmds[ip] != CMD_RET)
                                 ip++;

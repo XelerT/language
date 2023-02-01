@@ -80,8 +80,8 @@ char* make_line (int argc, ...)
                         if (temp_str[i] == 's') {
                                 strcpy(LOG_LINE + j, va_arg(valist, const char*));
                                 j += strlen(LOG_LINE + j);
-                        } else if (temp_str[i] == 'l' && temp_str[i + 1] == 'l' && temp_str[i + 2] == 'd') {
-                                sprintf(LOG_LINE + j, "%lld", va_arg(valist, size_t));
+                        } else if (temp_str[i] == 'l' && temp_str[i + 1] == 'd') {
+                                sprintf(LOG_LINE + j, "%ld", va_arg(valist, size_t));
                                 j += strlen(LOG_LINE + j);
                                 i += 2;
                         } else if (temp_str[i] == 'l' && temp_str[i + 1] == 'g') {

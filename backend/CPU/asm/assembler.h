@@ -1,7 +1,7 @@
 #ifndef ASM_H
 #define ASM_H
-#include "..\buffer.h"
-#include "..\cmd.h"
+#include "../buffer.h"
+#include "../cmd.h"
 
 const int MAX_N_LABELS = 50;
 const int MAX_LINE_LENGTH = 100;

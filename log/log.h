@@ -1,7 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "..\include\config.h"
+#include "../include/config.h"
 
 #ifdef ASSERT_ON
         #define assert_ptr(ptr) my_assert(ptr, #ptr, __FILE__, __LINE__)
@@ -19,7 +19,7 @@
         #define log_pic(num,...)
 #endif /*LOG_ON*/
 
-#include "..\debug\debug.h"
+#include "../debug/debug.h"
 
 enum log_errors {
         ASSERTION  = 0xACCE,

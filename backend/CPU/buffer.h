@@ -1,7 +1,7 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include "..\..\debug\debug.h"
+#include "../../debug/debug.h"
 
 struct line_t
 {
