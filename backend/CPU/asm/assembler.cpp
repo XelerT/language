@@ -210,8 +210,6 @@ int convert_code (code_t *code, FILE *output_code, int second_cycle, labels_t *l
                 fprintf(output_code, "%d ", asm_code[i]);
         }
 
-        // listing (code, asm_code, "fuck", 69);
-
         return 0;
 }
 
@@ -230,7 +228,6 @@ int asm_jmp_call (int second_cycle, code_t *code, int *asm_code,
                 sscanf(code->lines[i].ptr + strlen(cmd), "%s", name);
                 if ((asm_code[*ip] = get_jmp_line(labels, name)) == NO_LABEL)
                         return NO_LABEL;
-                // printf("asm line %d\n", asm_code[*ip - 1]);
         } else {
                 char label_name[MAX_NAME_LENGTH] = {0};
                 sscanf(code->lines[i].ptr + strlen(cmd), "%s", label_name);
@@ -389,12 +386,12 @@ int create_label (labels_t *labels, const char *cmd, int n_line, int is_call)
 {
         assert(labels);
         assert(cmd);
-                // printf(" qwerty2 %s %d\n", cmd, n_line);
+
         int i = 0;
         char name[MAX_NAME_LENGTH] = {};
         strcpy(name, cmd);
         int label_exist = get_jmp_line(labels, name);
-                // printf(" qwerty3 %s %d\n", name, n_line);
+
         while (name[i] != ':' && !is_call)
                 i++;
         if (!is_call)
@@ -405,8 +402,6 @@ int create_label (labels_t *labels, const char *cmd, int n_line, int is_call)
                         if (labels[i].name[0] == '\0') {
                                 strcpy(labels[i].name, name);
                                 labels[i].line = n_line;
-                                // printf("created label line %s: %d\n", labels[i].name, labels[i].line);
-                                // printf("N_LINE %d %s\n", labels[i].line, labels[i].name);
                                 break;
                         }
                 }
@@ -414,7 +409,6 @@ int create_label (labels_t *labels, const char *cmd, int n_line, int is_call)
                 for (i = 0; i < MAX_N_LABELS; i++) {
                         if (strcmp(labels[i].name, name) == 0) {
                                 labels[i].line = n_line;
-                                // printf("N_LINE %d %s\n", labels[i].line, labels[i].name);
                                 break;
                         }
                 }

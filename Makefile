@@ -77,11 +77,11 @@ def:
 
 .PHONY: run_asm
 run_asm:
-	@ $(ASM_OUTPUT) $(ASM_OUT) $(ASM_CODE)
+	@ $(ASM_OUTPUT) asm_code.prac asm_code.zbor
 
 .PHONY: run_cpu
 run_cpu:
-	@ $(CPU_OUTPUT) $(CPU_CODE)
+	./back
 
 .PHONY: run_lang
 run_backend:

@@ -26,9 +26,10 @@ int asm_assignment (FILE *output, node_t *node, tab_table_t *table);
 int asm_staff      (FILE *output, node_t *node, tab_table_t *table);
 int asm_return     (FILE *output, tab_table_t *table);
 
-size_t count_args  (node_t *node);
-int    cast_type   (node_t *node, tab_table_t *table);
-size_t find_var    (table_t *table, char *name);
+size_t count_all_vars (tab_table_t *table);
+size_t count_args     (node_t *node);
+int    cast_type      (node_t *node, tab_table_t *table);
+size_t find_var       (table_t *table, char *name);
 
 int indent_rbx (FILE *output, size_t n_args);
 

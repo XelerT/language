@@ -113,11 +113,11 @@ node_t* hub (const tokens_t *tokens, size_t *tp, tree_t *tree)
                                 check(node);
                         }
                 } else if (arg[*tp].type == CYCLE) {
-                        if (arg[*tp].type == WHILE) {
+                        if (arg[*tp].sub_type == WHILE) {
                                 node = get_while(tokens, tp, tree);
                                 check(node);
                         } else
-                                log_error(1, "Unknown cycle");
+                                log_error(2, "Unknown cycle");
                 } else if (arg[*tp].type == OPERATOR && arg[*tp].sub_type == IF) {
                         node = get_if(tokens, tp, tree);
                         check(node);

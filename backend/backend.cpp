@@ -216,13 +216,13 @@ int indent_rbx (FILE *output, size_t n_args)
 {
         assert_ptr(output);
 
-        fprintf(output, "pop rdx\n");
         fprintf(output, "push rbx\n");
+        fprintf(output, "pop rdx\n");
         fprintf(output, "push rbx\n");
         fprintf(output, "push %ld\n", n_args);
         fprintf(output, "add\n");
         fprintf(output, "pop rbx\n");
-        fprintf(output, "push rdx\n");
+        // fprintf(output, "push rdx\n");
 
         log(2, "Indent rbx on %ld", n_args);
 
@@ -474,6 +474,18 @@ int func_init (FILE *output, node_t *node, tab_table_t *table)
         return 0;
 }
 
+size_t count_all_vars (tab_table_t *table)
+{
+        assert_ptr(table);
+
+        size_t n_vars = table->gl_table->var_size;
+        for (size_t i = 0; i < table->loc_size; i++) {
+                n_vars += table->loc_tables[i]->var_size;
+        }
+
+        return n_vars;
+}
+
 int asm_func (FILE *output, node_t *node, tab_table_t *table)
 {
         assert_ptr(node);
@@ -509,7 +521,7 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
         }
 
         if (loc_table.var_cap && !is_main)
-                indent_rbx(output, n_args);
+                indent_rbx(output, n_args + count_all_vars(table));
 
         if (loc_table.var_size != 0) {
                 for (size_t i = loc_table.var_size - 1; i > 0 && !is_main; i--) {
@@ -520,7 +532,9 @@ int asm_func (FILE *output, node_t *node, tab_table_t *table)
 
                         log(2, "Add argument with \"%s\" name", loc_table.vars[i].name);
                 }
+                fprintf(output, "push rdx\n");
         }
+
         loc_table.var_size = n_args - loc_table.var_size;
 
         log(3, "here %s %ld", node->name, node->right->type);
