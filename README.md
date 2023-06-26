@@ -1,7 +1,5 @@
 # Binary translator
 
-## Overview
-
 ## Introduction
 
 This work was made as learning project during first semester at the university. This is C-like high level programming language which uses recursive descent to create abstract syntax tree (AST) and generate assembly code for my virtual stack [CPU](https://github.com/XelerT/cpu).
